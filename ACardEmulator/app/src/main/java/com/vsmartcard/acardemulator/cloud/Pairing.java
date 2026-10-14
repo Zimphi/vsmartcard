@@ -8,6 +8,15 @@ import java.util.Map;
 /** Public pairing envelope; never accepts an existing device token from a QR. */
 public final class Pairing {
     public final String server, code;
+    public static Pairing readJson(java.io.InputStream input) throws Exception {
+        java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();
+        byte[] buffer=new byte[512];int count;
+        while((count=input.read(buffer))!=-1){if(bytes.size()+count>2048)throw new IllegalArgumentException();bytes.write(buffer,0,count);}
+        org.json.JSONObject value=new org.json.JSONObject(bytes.toString("UTF-8"));
+        if(value.length()!=3||!"phoenix-phone-pairing-v1".equals(value.getString("format")))throw new IllegalArgumentException();
+        return new Pairing("phoenix://pair?server="+java.net.URLEncoder.encode(value.getString("server"),"UTF-8")
+            +"&code="+java.net.URLEncoder.encode(value.getString("pairing_code"),"UTF-8"));
+    }
     public Pairing(String value) throws Exception {
         if (value == null || value.length() > 2048) throw new IllegalArgumentException();
         URI uri = new URI(value);

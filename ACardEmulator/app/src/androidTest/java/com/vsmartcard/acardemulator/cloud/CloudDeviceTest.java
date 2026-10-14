@@ -9,6 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CloudDeviceTest {
+    @Test public void jsonPairingUsesTheSameHttpsAndOneTimeCodeValidation() throws Exception {
+        String json=new JSONObject().put("format","phoenix-phone-pairing-v1").put("server","https://example.org")
+            .put("pairing_code","AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA").toString();
+        Pairing pair=Pairing.readJson(new java.io.ByteArrayInputStream(json.getBytes("UTF-8")));
+        assertEquals("https://example.org",pair.server);
+        for(String invalid:new String[]{new JSONObject(json).put("server","http://example.org").toString(),new JSONObject(json).put("bridge_token","not-accepted").toString(),new String(new char[2049]).replace('\0',' ')}){
+            try{Pairing.readJson(new java.io.ByteArrayInputStream(invalid.getBytes("UTF-8")));fail("invalid JSON pairing accepted");}
+            catch(Exception expected){}
+        }
+    }
     @Test public void keystoreRoundTripNeverPersistsPlaintextToken() throws Exception {
         Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
         DeviceVault vault=new DeviceVault(context);JSONObject original=vault.load();

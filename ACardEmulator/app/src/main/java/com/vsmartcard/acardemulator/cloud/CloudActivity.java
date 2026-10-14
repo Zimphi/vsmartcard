@@ -17,6 +17,7 @@ import com.google.zxing.integration.android.IntentResult;
 import org.json.JSONObject;
 
 public final class CloudActivity extends Activity {
+    private static final int IMPORT_JSON=4702;
     private final Handler handler=new Handler();
     private TextView state,server;
     private RadioGroup roles;
@@ -33,9 +34,14 @@ public final class CloudActivity extends Activity {
         TextView title=new TextView(this);title.setText("Phoenix Cloud · NFC");title.setTextSize(24);root.addView(title);
         server=new TextView(this);server.setText("Noch nicht gekoppelt");root.addView(server);
         state=new TextView(this);state.setTextSize(18);root.addView(state);
-        TextView help=new TextView(this);help.setText("In den Einstellungen des Online-Simulators einen Kopplungs-QR-Code anzeigen und hier scannen. Der Rechner wird danach nicht benötigt.");root.addView(help);
+        TextView help=new TextView(this);help.setText("In den Einstellungen des Online-Simulators einen Kopplungs-QR-Code anzeigen oder eine JSON-Datei herunterladen. Der Rechner wird danach nicht benötigt.");root.addView(help);
         button(root,"QR-Code scannen",()->new IntentIntegrator(this).setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
             .setBeepEnabled(false).setBarcodeImageEnabled(false).setPrompt("Phoenix-Kopplungs-QR-Code scannen").initiateScan());
+        button(root,"JSON-Datei importieren",()->{
+            Intent file=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json");
+            file.putExtra("android.provider.extra.INITIAL_URI",android.net.Uri.parse("content://com.android.externalstorage.documents/document/primary%3ADownload"));
+            startActivityForResult(file,IMPORT_JSON);
+        });
         roles=new RadioGroup(this);
         RadioButton card=new RadioButton(this);card.setId(cardChoiceId);card.setText("Karte simulieren");roles.addView(card);
         RadioButton reader=new RadioButton(this);reader.setId(readerChoiceId);reader.setText("Echte NFC-Karte lesen");roles.addView(reader);
@@ -51,12 +57,26 @@ public final class CloudActivity extends Activity {
     @Override protected void onNewIntent(Intent i){super.onNewIntent(i);setIntent(i);handleIntent(i);}
     private void handleIntent(Intent i){if(i!=null&&i.getData()!=null){String raw=i.getDataString();i.setData(null);confirm(raw);}}
     @Override protected void onActivityResult(int request,int result,Intent data){
+        if(request==IMPORT_JSON){
+            if(result==RESULT_OK&&data!=null&&data.getData()!=null){
+                android.net.Uri file=data.getData();
+                new Thread(()->{
+                    try(java.io.InputStream input=getContentResolver().openInputStream(file)){
+                        Pairing pairing=Pairing.readJson(input);runOnUiThread(()->confirm(pairing));
+                    }catch(Exception e){runOnUiThread(()->show("Ungültige Phoenix-JSON-Datei. Bitte eine neue Konfiguration herunterladen."));}
+                },"phoenix-json").start();
+            }
+            return;
+        }
         IntentResult qr=IntentIntegrator.parseActivityResult(request,result,data);
         if(qr!=null){if(qr.getContents()!=null)confirm(qr.getContents());}else super.onActivityResult(request,result,data);
     }
     private void confirm(String raw){
         final Pairing p;
         try{p=new Pairing(raw);}catch(Exception e){show("Ungültiger Phoenix-Kopplungs-QR-Code");return;}
+        confirm(p);
+    }
+    private void confirm(Pairing p){
         new AlertDialog.Builder(this).setTitle("Telefon koppeln?")
             .setMessage("Dieser Server erhält Zugriff auf den gewählten NFC-Modus:\n"+p.server+"\nNur mit deinem eigenen Simulator koppeln.")
             .setNegativeButton("Abbrechen",null).setPositiveButton("Koppeln",(d,which)->{
