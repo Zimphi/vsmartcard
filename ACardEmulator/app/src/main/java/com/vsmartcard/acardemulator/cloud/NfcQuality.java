@@ -24,6 +24,9 @@ final class NfcQuality {
     }
     private static final ArrayDeque<Sample> samples=new ArrayDeque<>();
     private static long sequence;
+    static synchronized void clear(String source){
+        java.util.Iterator<Sample> iterator=samples.iterator();while(iterator.hasNext())if(iterator.next().source.equals(source))iterator.remove();
+    }
     static synchronized long sequence(){return sequence;}
     static synchronized void record(String source,double ms,boolean success){
         if(!Double.isFinite(ms)||ms<0)throw new IllegalArgumentException();

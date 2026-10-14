@@ -17,7 +17,7 @@ public final class CloudHelpActivity extends CloudScreen {
         findViewById(R.id.cloud_help_action).setOnClickListener(v->{
             if(step==0)startActivity(new Intent(this,CloudPairingActivity.class));
             else if(step==4)startActivity(new Intent(this,CloudDiagnosticsActivity.class));
-            else if(step==2)try{startActivity(CloudInfoActivity.websiteIntent());}catch(android.content.ActivityNotFoundException e){}
+            else if(step==2)try{startActivity(CloudInfoActivity.websiteIntent());}catch(android.content.ActivityNotFoundException e){android.widget.Toast.makeText(this,R.string.cloud_no_browser,android.widget.Toast.LENGTH_SHORT).show();}
             else finish();
         });render();
     }

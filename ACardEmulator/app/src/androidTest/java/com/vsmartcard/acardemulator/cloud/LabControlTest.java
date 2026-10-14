@@ -34,7 +34,7 @@ public class LabControlTest {
             accepted.put("profile_verified",false);assertNull(LabControl.successfulReport(accepted));
             control.cancel();assertEquals(id,read(folder,"lab-cancel.json").getString("id"));
             try{control.request("shell","eid",1);fail();}catch(IllegalArgumentException expected){}
-        }finally{for(File file:folder.listFiles())assertTrue(file.delete());assertTrue(folder.delete());}
+        }finally{NfcQuality.clear("mac-pcsc");for(File file:folder.listFiles())assertTrue(file.delete());assertTrue(folder.delete());}
     }
     @Test public void cancelledDisclosureNeverCreatesTestRequest() throws Exception {
         android.app.Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();
@@ -46,6 +46,28 @@ public class LabControlTest {
             dialog.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick();activity.finish();
         });
         byte[] after=request.exists()?java.nio.file.Files.readAllBytes(request.toPath()):null;assertArrayEquals(before,after);
+    }
+    @Test public void compatibilityUploadHappensOnlyAfterPositiveConfirmation() throws Exception {
+        android.app.Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();
+        Context context=instrumentation.getTargetContext();
+        CloudDiagnosticsActivity activity=(CloudDiagnosticsActivity)instrumentation.startActivitySync(new android.content.Intent(context,CloudDiagnosticsActivity.class).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+        java.util.concurrent.CountDownLatch uploaded=new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.atomic.AtomicInteger calls=new java.util.concurrent.atomic.AtomicInteger();
+        final JSONObject[] received={null};
+        CloudApi api=new CloudApi("https://example.org",null){@Override JSONObject post(String endpoint,JSONObject value)throws Exception{
+            assertEquals("compatibility",endpoint);received[0]=new JSONObject(value.toString());calls.incrementAndGet();uploaded.countDown();return new JSONObject().put("saved",true);
+        }};
+        JSONObject report=LabControl.device().put("passed",true).put("test_id",java.util.UUID.randomUUID().toString())
+            .put("mode","card").put("source","cloud-eac").put("attempts",1).put("successes",1);
+        try{
+            instrumentation.runOnMainSync(()->{
+                android.app.AlertDialog dialog=activity.showCompatibility(report,api);
+                assertTrue(dialog.isShowing());assertFalse(report.has("consent"));assertEquals(0,calls.get());
+                dialog.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick();assertEquals(0,calls.get());
+                activity.showCompatibility(report,api).getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick();
+            });
+            assertTrue(uploaded.await(5,java.util.concurrent.TimeUnit.SECONDS));assertEquals(1,calls.get());assertTrue(received[0].getBoolean("consent"));
+        }finally{instrumentation.runOnMainSync(activity::finish);}
     }
     private static JSONObject read(File folder,String name) throws Exception {
         try(java.io.FileInputStream in=new java.io.FileInputStream(new File(folder,name))){

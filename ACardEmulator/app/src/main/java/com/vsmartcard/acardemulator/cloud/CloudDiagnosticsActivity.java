@@ -131,7 +131,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         if(nfc==null||!nfc.isEnabled()){message(R.string.cloud_test_nfc_required);return;}
         new android.app.AlertDialog.Builder(this).setTitle(R.string.cloud_test_reader).setMessage(R.string.cloud_test_disclosure)
             .setNegativeButton(android.R.string.cancel,null).setPositiveButton(R.string.cloud_test_start,(dialog,which)->{
-                sourceOverride="phone-reader";useLab=false;readerKind=kind();successfulReport=null;testing=true;positionReader=position;
+                sourceOverride="phone-reader";useLab=false;NfcQuality.clear("phone-reader");readerKind=kind();successfulReport=null;testing=true;positionReader=position;
                 if(service!=null){service.localTest=true;testReader=service.reader;}
                 if(position)beginPosition();enableReader();message(R.string.cloud_test_waiting);
                 if(testReader.detected())runReaderTest();
@@ -183,7 +183,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         if(!java.util.Arrays.asList("usb-profile","cloud-eac","baseline").contains(mode))throw new IllegalArgumentException();
         return new android.app.AlertDialog.Builder(this).setTitle(R.string.cloud_lab_title).setMessage(R.string.cloud_lab_disclosure)
             .setNegativeButton(android.R.string.cancel,null).setPositiveButton(R.string.cloud_test_start,(dialog,which)->{
-                try{useLab=true;labMode=mode;lab.request(labMode,kind(),"baseline".equals(mode)?120:1);labActive=true;sourceOverride="mac-pcsc";successfulReport=null;message(R.string.cloud_lab_waiting);}
+                try{useLab=true;labMode=mode;NfcQuality.clear("mac-pcsc");lab.request(labMode,kind(),"baseline".equals(mode)?120:1);labActive=true;sourceOverride="mac-pcsc";successfulReport=null;message(R.string.cloud_lab_waiting);}
                 catch(Exception failure){message(R.string.cloud_lab_error);}
             }).show();
     }
@@ -205,13 +205,16 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         CloudService service=CloudService.current;
         if(service==null||service.api==null||!CloudService.connected()){message(R.string.cloud_compatibility_failed);return;}
         final org.json.JSONObject report;try{report=new org.json.JSONObject(successfulReport.toString());}catch(Exception invalid){return;}
-        String account=service.api.account==null?service.api.server:service.api.account.name+"\n"+service.api.server;
+        showCompatibility(report,service.api);
+    }
+    android.app.AlertDialog showCompatibility(final org.json.JSONObject report,CloudApi api){
+        String account=api.account==null?api.server:api.account.name+"\n"+api.server;
         String details=report.optString("manufacturer")+" · "+report.optString("model")+"\nAndroid "+report.optString("android_release")+" · "+report.optString("app_version")+"\n"+report.optString("mode")+" · "+report.optInt("successes")+"/"+report.optInt("attempts");
-        new android.app.AlertDialog.Builder(this).setTitle(R.string.cloud_compatibility)
+        return new android.app.AlertDialog.Builder(this).setTitle(R.string.cloud_compatibility)
             .setMessage(getString(R.string.cloud_compatibility_disclosure)+"\n\n"+account+"\n\n"+details)
             .setNegativeButton(android.R.string.cancel,null).setPositiveButton(R.string.cloud_compatibility_save,(dialog,which)->{
                 new Thread(()->{
-                    boolean saved=false;try{report.put("consent",true);saved=service.api.post("compatibility",report).optBoolean("saved");}catch(Exception failure){}
+                    boolean saved=false;try{report.put("consent",true);saved=api.post("compatibility",report).optBoolean("saved");}catch(Exception failure){}
                     final boolean accepted=saved;runOnUiThread(()->message(accepted?R.string.cloud_compatibility_saved:R.string.cloud_compatibility_failed));
                 },"phoenix-compatibility").start();
             }).show();

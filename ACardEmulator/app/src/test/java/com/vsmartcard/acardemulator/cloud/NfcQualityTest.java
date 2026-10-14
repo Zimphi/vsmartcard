@@ -10,6 +10,7 @@ public class NfcQualityTest {
         NfcQuality.Stats stats=new NfcQuality.Stats(samples(10,8,20));assertEquals(80,stats.percent());assertEquals(20,stats.p95,0);
         long from=NfcQuality.sequence();NfcQuality.record("a",10,true);NfcQuality.record("b",30,false);
         assertEquals(1,NfcQuality.after("a",from).size());assertEquals(1,NfcQuality.after("b",from).size());
+        NfcQuality.clear("a");assertTrue(NfcQuality.after("a",0).isEmpty());assertEquals(1,NfcQuality.after("b",from).size());
     }
     @Test public void positionSearchRequiresSamplesAndPrefersReliabilityBeforeLatency(){
         PositionGuide p=new PositionGuide();assertEquals(-1,p.best());assertFalse(p.record(samples(2,2,10)));
