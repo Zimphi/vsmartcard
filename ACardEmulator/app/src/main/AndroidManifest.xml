@@ -19,6 +19,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
     <application
+        android:localeConfig="@xml/phoenix_locales"
         android:allowBackup="false"
         android:icon="@mipmap/phoenix_launcher"
         android:roundIcon="@mipmap/phoenix_launcher"
@@ -70,6 +71,8 @@
                 <data android:scheme="phoenix" android:host="pair"/>
             </intent-filter>
         </activity>
+        <activity android:name="com.vsmartcard.acardemulator.cloud.CloudDiagnosticsActivity" android:exported="false" android:label="@string/cloud_diagnostics" android:theme="@style/CloudTheme"/>
+        <activity android:name="com.vsmartcard.acardemulator.cloud.CloudHelpActivity" android:exported="false" android:label="@string/cloud_help" android:theme="@style/CloudTheme"/>
         <activity android:name="com.vsmartcard.acardemulator.cloud.CloudInfoActivity" android:exported="false" android:label="@string/cloud_about" android:theme="@style/CloudTheme"/>
         <activity android:name="com.vsmartcard.acardemulator.cloud.CloudPairingActivity" android:exported="false" android:label="@string/cloud_setup_title" android:theme="@style/CloudTheme"/>
         <service android:name="com.vsmartcard.acardemulator.cloud.CloudService" android:exported="false" android:foregroundServiceType="connectedDevice"/>

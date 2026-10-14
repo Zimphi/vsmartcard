@@ -59,6 +59,14 @@ public class CloudDeviceTest {
         api.statusPacket.put("active",false);api.heartbeat(new JSONObject());
         assertFalse(api.profile.active);assertNull(api.profile.id);
     }
+    @Test public void deviceAccountShowsOnlyPairedOwnerDisplayAndSupportedLanguage()throws Exception{
+        FakeApi api=new FakeApi();
+        api.statusPacket=new JSONObject().put("session_id",api.id).put("active",false)
+            .put("account",new JSONObject().put("display_name","Test User").put("language","en"));
+        api.heartbeat(new JSONObject());assertEquals("Test User",api.account.name);assertEquals("en",api.account.language);
+        api.statusPacket.getJSONObject("account").put("language","unknown");api.heartbeat(new JSONObject());assertNull(api.account.language);
+        api.statusPacket.remove("account");api.heartbeat(new JSONObject());assertNull(api.account);
+    }
     @Test public void cardSessionMountsOnceAndAdvancesEveryApdu()throws Exception{
         FakeApi api=new FakeApi();
         assertArrayEquals(new byte[]{(byte)0x90,0},api.apdu(new byte[]{0, (byte)0xa4,4,0}));

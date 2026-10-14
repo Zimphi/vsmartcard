@@ -11,7 +11,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import org.json.JSONObject;
 
-public final class CloudPairingActivity extends Activity {
+public final class CloudPairingActivity extends CloudScreen {
     private static final int IMPORT_JSON=4702;
     private TextView state;
     @Override public void onCreate(Bundle saved){
@@ -22,7 +22,7 @@ public final class CloudPairingActivity extends Activity {
         state=findViewById(R.id.cloud_pairing_message);
         findViewById(R.id.cloud_pairing_back).setOnClickListener(v->finish());
         findViewById(R.id.cloud_scan).setOnClickListener(v->new IntentIntegrator(this).setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-            .setBeepEnabled(false).setBarcodeImageEnabled(false).setPrompt("Phoenix-Kopplungs-QR-Code scannen").initiateScan());
+            .setBeepEnabled(false).setBarcodeImageEnabled(false).setPrompt(getString(R.string.cloud_scan_prompt)).initiateScan());
         findViewById(R.id.cloud_import).setOnClickListener(v->{
             Intent file=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json");
             file.putExtra("android.provider.extra.INITIAL_URI",android.net.Uri.parse("content://com.android.externalstorage.documents/document/primary%3ADownload"));
@@ -38,7 +38,7 @@ public final class CloudPairingActivity extends Activity {
                 new Thread(()->{
                     try(java.io.InputStream input=getContentResolver().openInputStream(file)){
                         Pairing pairing=Pairing.readJson(input);runOnUiThread(()->confirm(pairing));
-                    }catch(Exception e){runOnUiThread(()->show("Ungültige Phoenix-JSON-Datei. Bitte eine neue Konfiguration herunterladen."));}
+                    }catch(Exception e){runOnUiThread(()->show(getString(R.string.cloud_json_error)));}
                 },"phoenix-json").start();
             }
             return;
@@ -48,21 +48,21 @@ public final class CloudPairingActivity extends Activity {
     }
     private void confirm(String raw){
         final Pairing p;
-        try{p=new Pairing(raw);}catch(Exception e){show("Ungültiger Phoenix-Kopplungs-QR-Code");return;}
+        try{p=new Pairing(raw);}catch(Exception e){show(getString(R.string.cloud_qr_error));return;}
         confirm(p);
     }
     private void confirm(Pairing p){
-        new AlertDialog.Builder(this).setTitle("Telefon koppeln?")
-            .setMessage("Dieser Server erhält Zugriff auf den gewählten NFC-Modus:\n"+p.server+"\nNur mit deinem eigenen Simulator koppeln.")
-            .setNegativeButton("Abbrechen",null).setPositiveButton("Koppeln",(d,which)->{
-                stopService(new Intent(this,CloudService.class));show("Kopplung läuft …");
+        new AlertDialog.Builder(this).setTitle(getString(R.string.cloud_pair_confirm))
+            .setMessage(getString(R.string.cloud_pair_disclosure,p.server))
+            .setNegativeButton(getString(R.string.cloud_cancel),null).setPositiveButton(getString(R.string.cloud_pair_action),(d,which)->{
+                stopService(new Intent(this,CloudService.class));show(getString(R.string.cloud_pair_running));
                 new Thread(()->{
                     try{
                         JSONObject reply=new CloudApi(p.server,null).post("redeem",new JSONObject().put("pairing_code",p.code));
                         String token=reply.getString("bridge_token");if(!token.matches("[A-Za-z0-9_-]{43}"))throw new IllegalArgumentException();
                         new DeviceVault(this).save(p.server,token);
                         runOnUiThread(()->{setResult(RESULT_OK);finish();});
-                    }catch(Exception e){runOnUiThread(()->show("Kopplung fehlgeschlagen oder Code abgelaufen. Neuen QR-Code im Simulator erzeugen."));}
+                    }catch(Exception e){runOnUiThread(()->show(getString(R.string.cloud_pair_error)));}
                 },"phoenix-pair").start();
             }).show();
     }

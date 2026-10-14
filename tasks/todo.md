@@ -1,8 +1,8 @@
 # Release checklist
 
-- [ ] Device account/language API + migration + Rust/SQL tests.
-- [ ] Dedicated diagnostic window; remove developer data from home.
-- [ ] German/English resources, subtle language picker and account synchronization.
+- [x] Device account/language API + migration + Rust/SQL tests (migration applied; API deployment pending).
+- [x] Dedicated diagnostic window; remove developer data from home (12 device tests pass).
+- [x] German/English resources and subtle language picker; account sync implemented, live API check pending.
 - [ ] Measured NFC quality model and sample windows + graph + guided positioning.
 - [ ] Structured reader/card NFC tester with explicit Start/Stop and prerequisites.
 - [ ] Authorized ADB Mac companion with safe request parsing + progress/results.

@@ -16,7 +16,7 @@ import ACardEmulator.R;
 import ACardEmulator.BuildConfig;
 import org.json.JSONObject;
 
-public final class CloudInfoActivity extends Activity {
+public final class CloudInfoActivity extends CloudScreen {
     private final Handler handler=new Handler();
     private final Runnable refresh=new Runnable(){public void run(){
         refreshConnection();handler.postDelayed(this,1000);
@@ -26,9 +26,7 @@ public final class CloudInfoActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.phoenix_cloud_info);
         ((TextView)findViewById(R.id.cloud_info_version)).setText(getString(R.string.cloud_version,BuildConfig.VERSION_NAME));
-        android.widget.CheckBox developer=findViewById(R.id.cloud_developer_options);
-        developer.setChecked(getSharedPreferences("phoenix-ui",MODE_PRIVATE).getBoolean("developer_options",false));
-        developer.setOnCheckedChangeListener((button,checked)->getSharedPreferences("phoenix-ui",MODE_PRIVATE).edit().putBoolean("developer_options",checked).apply());
+        findViewById(R.id.cloud_info_diagnostics).setOnClickListener(v->startActivity(new Intent(this,CloudDiagnosticsActivity.class)));
         findViewById(R.id.cloud_license).setOnClickListener(v->showLicense());
         findViewById(R.id.cloud_info_back).setOnClickListener(v->finish());
         findViewById(R.id.cloud_website).setOnClickListener(v->{
@@ -52,6 +50,10 @@ public final class CloudInfoActivity extends Activity {
     }
     static Intent websiteIntent(){return new Intent(Intent.ACTION_VIEW,Uri.parse("https://epassport-simulator.de"));}
     private void refreshConnection(){
+        if(refreshLanguage())return;
+        CloudService service=CloudService.current;
+        CloudApi.Account account=service==null||service.api==null?null:service.api.account;
+        ((TextView)findViewById(R.id.cloud_info_user)).setText(account==null?getString(R.string.cloud_account_pending):account.name);
         JSONObject saved=null;
         try{saved=new DeviceVault(this).load();}catch(Exception ignored){}
         ((TextView)findViewById(R.id.cloud_info_server)).setText(saved==null?getString(R.string.cloud_not_paired):saved.optString("server"));
@@ -59,7 +61,7 @@ public final class CloudInfoActivity extends Activity {
         TextView status=findViewById(R.id.cloud_info_status);
         status.setText((online?"✓ ":"✕ ")+getString(online?R.string.cloud_connected:saved!=null?R.string.cloud_saved_offline:R.string.cloud_unpaired));
         status.setTextColor(getColor(online?R.color.cloud_green:R.color.cloud_red));
-        ((TextView)findViewById(R.id.cloud_info_detail)).setText(CloudService.status);
+        ((TextView)findViewById(R.id.cloud_info_detail)).setText(CloudService.statusResource);
     }
     @Override protected void onResume(){super.onResume();handler.post(refresh);}
     @Override protected void onPause(){handler.removeCallbacks(refresh);super.onPause();}

@@ -1,0 +1,14 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/cloud_background" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+        <Button android:id="@+id/cloud_diagnostics_back" style="@style/CloudSecondaryButton" android:text="@string/cloud_back"/>
+        <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_diagnostics" android:textSize="24sp"/>
+        <CheckBox android:id="@+id/cloud_developer_options" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginTop="16dp" android:text="@string/cloud_developer_options" android:textColor="@color/cloud_ink" android:buttonTint="@color/cloud_blue"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cloud_developer_help" android:textColor="@color/cloud_muted" android:textSize="14sp"/>
+        <LinearLayout android:id="@+id/cloud_log_panel" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="24dp" android:padding="16dp" android:background="@drawable/cloud_panel" android:visibility="gone">
+            <TextView style="@style/CloudHeading" android:text="@string/cloud_log_title"/>
+            <ScrollView android:id="@+id/cloud_log_scroll" android:layout_width="match_parent" android:layout_height="320dp" android:layout_marginTop="12dp" android:fillViewport="true">
+                <TextView android:text="@string/cloud_log_empty" android:id="@+id/cloud_log_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:fontFamily="monospace" android:textSize="12sp" android:textColor="@color/cloud_ink" android:lineSpacingExtra="4dp"/>
+            </ScrollView>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

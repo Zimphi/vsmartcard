@@ -1,6 +1,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="@color/cloud_background">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
-        <ImageButton android:id="@+id/cloud_logo" android:background="?android:attr/selectableItemBackgroundBorderless" android:padding="0dp" android:layout_width="96dp" android:layout_height="96dp" android:layout_gravity="center_horizontal" android:src="@drawable/phoenix_cloud_logo" android:contentDescription="@string/cloud_open_about" android:scaleType="fitCenter"/>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="96dp">
+            <Button android:id="@+id/cloud_language_button" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="start|top" android:text="DE" android:contentDescription="@string/cloud_language" android:textSize="12sp" android:textColor="@color/cloud_blue" android:background="?android:attr/selectableItemBackgroundBorderless"/>
+            <ImageButton android:id="@+id/cloud_logo" android:background="?android:attr/selectableItemBackgroundBorderless" android:padding="0dp" android:layout_width="96dp" android:layout_height="96dp" android:layout_gravity="center" android:src="@drawable/phoenix_cloud_logo" android:contentDescription="@string/cloud_open_about" android:scaleType="fitCenter"/>
+            <Button android:id="@+id/cloud_help" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="end|top" android:text="?" android:textSize="24sp" android:textColor="@color/cloud_blue" android:contentDescription="@string/cloud_help" android:background="?android:attr/selectableItemBackgroundBorderless"/>
+        </FrameLayout>
         <TextView style="@style/CloudHeading" android:layout_marginTop="8dp" android:layout_marginBottom="24dp" android:gravity="center" android:text="@string/cloud_title" android:textSize="24sp"/>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:background="@drawable/cloud_panel">
             <TextView style="@style/CloudHeading" android:text="@string/cloud_pairing_title"/>
@@ -26,12 +30,7 @@
         <Button android:id="@+id/cloud_connection_action" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="8dp" android:text="@string/cloud_connect" android:textAllCaps="false" android:textSize="16sp" android:textColor="#FFFFFF" android:backgroundTint="@color/cloud_blue"/>
         <Button android:id="@+id/cloud_manage_pairing" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_manage_pairing"/>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/cloud_note" android:textColor="@color/cloud_muted" android:textSize="13sp"/>
-        <LinearLayout android:id="@+id/cloud_log_panel" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="24dp" android:padding="16dp" android:background="@drawable/cloud_panel" android:visibility="gone">
-            <TextView style="@style/CloudHeading" android:text="@string/cloud_log_title"/>
-            <ScrollView android:id="@+id/cloud_log_scroll" android:layout_width="match_parent" android:layout_height="220dp" android:layout_marginTop="12dp" android:fillViewport="true">
-                <TextView android:text="@string/cloud_log_empty" android:id="@+id/cloud_log_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:fontFamily="monospace" android:textSize="12sp" android:textColor="@color/cloud_ink" android:lineSpacingExtra="4dp"/>
-            </ScrollView>
-        </LinearLayout>
+        <Button android:id="@+id/cloud_open_diagnostics" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_diagnostics"/>
         <TextView android:id="@+id/cloud_version" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:gravity="center" android:textColor="@color/cloud_muted" android:textSize="12sp"/>
     </LinearLayout>
 </ScrollView>

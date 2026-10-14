@@ -1,4 +1,5 @@
 package com.vsmartcard.acardemulator.cloud;
+import ACardEmulator.R;
 
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -34,7 +35,7 @@ final class PhoneReader {
             atr=new byte[5+historical.length];atr[0]=0x3b;atr[1]=(byte)(0x80+historical.length);atr[2]=(byte)0x80;atr[3]=1;
             System.arraycopy(historical,0,atr,4,historical.length);
             for(int i=1;i<atr.length-1;i++)atr[atr.length-1]^=atr[i];
-            detected=true;CloudLog.add("NFC","ISO-DEP-Karte erkannt",false);
+            detected=true;CloudLog.add("NFC",R.string.cloud_log_card_detected,false);
         }catch(Exception e){detach();throw e;}
     }
     synchronized void detach(){ detected=false;activity.ended();if(card!=null){try{card.close();}catch(Exception ignored){}}card=null;atr=null;session=null; }

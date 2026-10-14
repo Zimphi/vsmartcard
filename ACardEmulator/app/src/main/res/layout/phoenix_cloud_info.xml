@@ -11,8 +11,9 @@
             <TextView android:id="@+id/cloud_info_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:textSize="16sp" android:textStyle="bold" android:accessibilityLiveRegion="polite"/>
             <TextView android:id="@+id/cloud_info_detail" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/cloud_muted"/>
         </LinearLayout>
-        <CheckBox android:id="@+id/cloud_developer_options" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginTop="24dp" android:text="@string/cloud_developer_options" android:textColor="@color/cloud_ink" android:buttonTint="@color/cloud_blue"/>
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cloud_developer_help" android:textColor="@color/cloud_muted" android:textSize="14sp"/>
+        <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_account_title"/>
+        <TextView android:id="@+id/cloud_info_user" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/cloud_account_pending" android:textSize="15sp" android:textColor="@color/cloud_muted"/>
+        <Button android:id="@+id/cloud_info_diagnostics" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_diagnostics"/>
         <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_website_title"/>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/cloud_website_description" android:textSize="15sp" android:textColor="@color/cloud_muted"/>
         <Button android:id="@+id/cloud_website" style="@style/CloudSecondaryButton" android:layout_marginTop="8dp" android:text="@string/cloud_website_address"/>
