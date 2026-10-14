@@ -1,6 +1,7 @@
 package com.vsmartcard.acardemulator.cloud;
 
 import android.app.Service;
+import ACardEmulator.R;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -22,14 +23,23 @@ public final class CloudService extends Service {
     volatile String mode="card";
     CloudApi api;
     private ScheduledExecutorService worker;
-    private long lastBeat,lastInventory;
+    private volatile long lastBeat;
+    private long lastInventory;
+    private volatile long lastContact;
+    static boolean connectionFresh(boolean running,long confirmed,long now){
+        return running&&confirmed>0&&now>=confirmed&&now-confirmed<15000;
+    }
+    static boolean connected(){
+        CloudService service=current;
+        return service!=null&&connectionFresh(true,service.lastContact,android.os.SystemClock.elapsedRealtime());
+    }
     private final String instance=UUID.randomUUID().toString();
     @Override public IBinder onBind(Intent i){return null;}
     @Override public int onStartCommand(Intent i,int flags,int startId){
         if(i==null){stopSelf();return START_NOT_STICKY;}
         String requested=i.getStringExtra("mode");
         if(!"card".equals(requested)&&!"reader".equals(requested)){stopSelf();return START_NOT_STICKY;}
-        if(current==this&&worker!=null){if(!mode.equals(requested)){reader.detach();worker.execute(api::end);}mode=requested;return START_NOT_STICKY;}
+        if(current==this&&worker!=null){if(!mode.equals(requested)){reader.detach();worker.execute(api::end);}mode=requested;lastBeat=0;return START_NOT_STICKY;}
         mode=requested;
         try{
             JSONObject saved=new DeviceVault(this).load();if(saved==null)throw new IllegalStateException();
@@ -39,8 +49,8 @@ public final class CloudService extends Service {
             PendingIntent open=PendingIntent.getActivity(this,0,new Intent(this,CloudActivity.class),PendingIntent.FLAG_IMMUTABLE);
             Notification.Builder notification=android.os.Build.VERSION.SDK_INT>=26?new Notification.Builder(this,"phoenix-cloud"):new Notification.Builder(this);
             startForeground(4701,notification.setContentTitle("Phoenix Cloud ist aktiv")
-                .setContentText("NFC-Karte oder NFC-Leser · Verbindung in der App beenden")
-                .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth).setContentIntent(open).setOngoing(true).build());
+                .setContentText("NFC-Karte oder NFC-Leser · Verbindung in der App aufheben")
+                .setSmallIcon(R.drawable.cloud_notification).setContentIntent(open).setOngoing(true).build());
             current=this;worker=Executors.newSingleThreadScheduledExecutor();
             worker.scheduleWithFixedDelay(this::tick,0,500,TimeUnit.MILLISECONDS);
         }catch(Exception e){status="Kopplung nicht verfügbar";stopSelf();}
@@ -53,6 +63,7 @@ public final class CloudService extends Service {
             if(now-lastBeat>=5000||lastBeat==0){lastBeat=now;
                 api.heartbeat(new JSONObject().put("reader_connected","card".equals(mode)&&enabled)
                     .put("device_kind","android").put("mode",mode).put("nfc_enabled",enabled));
+                lastContact=android.os.SystemClock.elapsedRealtime();
                 status=enabled?("card".equals(mode)?"Online · Kartenmodus":"Online · Lesemodus") :"Online · NFC ausgeschaltet";
             }
             if("reader".equals(mode)){
@@ -65,8 +76,8 @@ public final class CloudService extends Service {
                     api.post("reader-result",new JSONObject().put("id",job.getString("id")).put("result",result));
                 }
             }
-        }catch(CloudApi.Denied e){status="Gerätefreigabe widerrufen · erneut koppeln";new DeviceVault(this).clear();stopSelf();}
-        catch(Exception e){status="Offline · Verbindung wird erneut geprüft";}
+        }catch(CloudApi.Denied e){lastContact=0;status="Gerätefreigabe widerrufen · erneut koppeln";new DeviceVault(this).clear();stopSelf();}
+        catch(Exception e){lastContact=0;status="Offline · Verbindung wird erneut geprüft";}
     }
     private void inventory() throws Exception {
         JSONArray list=new JSONArray();

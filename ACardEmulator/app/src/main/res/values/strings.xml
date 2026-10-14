@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Smart Card Emulator</string>
+    <string name="app_name">Phoenix Cloud</string>
 
     <string name="status_error">Error</string>
     <string name="status_disconnected">Disconnected from terminal</string>

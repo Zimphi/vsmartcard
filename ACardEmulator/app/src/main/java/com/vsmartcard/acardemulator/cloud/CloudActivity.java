@@ -1,101 +1,83 @@
 package com.vsmartcard.acardemulator.cloud;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
+import ACardEmulator.R;
+import ACardEmulator.BuildConfig;
 import android.widget.TextView;
 import android.widget.RadioGroup;
-import android.widget.RadioButton;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import org.json.JSONObject;
 
 public final class CloudActivity extends Activity {
-    private static final int IMPORT_JSON=4702;
+    private static final int PAIRING_REQUEST=4703;
     private final Handler handler=new Handler();
-    private TextView state,server;
+    private TextView state,server,pairingStatus,statusMark;
+    private Button connectionAction;
+    private ImageView connectionIcon;
     private RadioGroup roles;
-    private final int cardChoiceId=android.view.View.generateViewId(), readerChoiceId=android.view.View.generateViewId();
+    private final int cardChoiceId=R.id.cloud_card_mode, readerChoiceId=R.id.cloud_reader_mode;
     private String mode="card";
     private final Runnable refresh=new Runnable(){public void run(){
-        state.setText(CloudService.status);handler.postDelayed(this,1000);
+        refreshConnection();handler.postDelayed(this,1000);
     }};
     @Override public void onCreate(Bundle saved){
         super.onCreate(saved);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE|WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);
-        int pad=(int)(24*getResources().getDisplayMetrics().density);root.setPadding(pad,pad,pad,pad);
-        TextView title=new TextView(this);title.setText("Phoenix Cloud · NFC");title.setTextSize(24);root.addView(title);
-        server=new TextView(this);server.setText("Noch nicht gekoppelt");root.addView(server);
-        state=new TextView(this);state.setTextSize(18);root.addView(state);
-        TextView help=new TextView(this);help.setText("In den Einstellungen des Online-Simulators einen Kopplungs-QR-Code anzeigen oder eine JSON-Datei herunterladen. Der Rechner wird danach nicht benötigt.");root.addView(help);
-        button(root,"QR-Code scannen",()->new IntentIntegrator(this).setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-            .setBeepEnabled(false).setBarcodeImageEnabled(false).setPrompt("Phoenix-Kopplungs-QR-Code scannen").initiateScan());
-        button(root,"JSON-Datei importieren",()->{
-            Intent file=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json");
-            file.putExtra("android.provider.extra.INITIAL_URI",android.net.Uri.parse("content://com.android.externalstorage.documents/document/primary%3ADownload"));
-            startActivityForResult(file,IMPORT_JSON);
-        });
-        roles=new RadioGroup(this);
-        RadioButton card=new RadioButton(this);card.setId(cardChoiceId);card.setText("Karte simulieren");roles.addView(card);
-        RadioButton reader=new RadioButton(this);reader.setId(readerChoiceId);reader.setText("Echte NFC-Karte lesen");roles.addView(reader);
-        roles.check(cardChoiceId);roles.setOnCheckedChangeListener((group,id)->{mode=id==cardChoiceId?"card":"reader";if(CloudService.current!=null)connect();});root.addView(roles);
-        button(root,"Verbinden",this::connect);
-        button(root,"Verbindung beenden",()->{stopService(new Intent(this,CloudService.class));disableReader();show("Nicht verbunden");});
-        TextView note=new TextView(this);note.setText("Im Lesemodus die App geöffnet lassen und die Karte an die NFC-Antenne halten. Zum Widerrufen der Gerätefreigabe die Vercel-Einstellungen verwenden.");root.addView(note);
-        android.widget.ScrollView scroll=new android.widget.ScrollView(this);scroll.addView(root);
-        setContentView(scroll);handleIntent(getIntent());
+        setContentView(R.layout.phoenix_cloud);
+        state=findViewById(R.id.cloud_state);server=findViewById(R.id.cloud_server);
+        pairingStatus=findViewById(R.id.cloud_pairing_status);statusMark=findViewById(R.id.cloud_status_mark);
+        connectionAction=findViewById(R.id.cloud_connection_action);connectionIcon=findViewById(R.id.cloud_connection_icon);
+        findViewById(R.id.cloud_manage_pairing).setOnClickListener(v->startActivityForResult(new Intent(this,CloudPairingActivity.class),PAIRING_REQUEST));
+        ((TextView)findViewById(R.id.cloud_version)).setText(getString(R.string.cloud_version,BuildConfig.VERSION_NAME));
+        roles=findViewById(R.id.cloud_roles);
+        roles.check(cardChoiceId);roles.setOnCheckedChangeListener((group,id)->{mode=id==cardChoiceId?"card":"reader";if(CloudService.current!=null)connect();});
+        connectionAction.setOnClickListener(v->{if(CloudService.connected())disconnect();else connect();});
+        refreshConnection();handleIntent(getIntent());
+    }
+    private void refreshConnection(){
+        JSONObject saved=null;
+        try{saved=new DeviceVault(this).load();}catch(Exception ignored){}
+        server.setText(saved==null?getString(R.string.cloud_not_paired):saved.optString("server"));
+        renderConnection(CloudService.connected(),saved!=null);
+        state.setText(CloudService.status);
+    }
+    void renderConnection(boolean online,boolean paired){
+        int color=getColor(online?R.color.cloud_green:R.color.cloud_red);
+        statusMark.setText(online?"✓":"✕");statusMark.setTextColor(color);
+        pairingStatus.setText(online?R.string.cloud_connected:paired?R.string.cloud_saved_offline:R.string.cloud_unpaired);
+        pairingStatus.setTextColor(color);
+        connectionIcon.setImageResource(online?R.drawable.cloud_connected:R.drawable.cloud_disconnected);
+        connectionIcon.setContentDescription(getString(online?R.string.cloud_connected_icon:R.string.cloud_disconnected_icon));
+        connectionAction.setText(online?R.string.cloud_disconnect:R.string.cloud_connect);
+    }
+    private void disconnect(){
+        stopService(new Intent(this,CloudService.class));disableReader();
+        NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);
+        if(nfc!=null)android.nfc.cardemulation.CardEmulation.getInstance(nfc).unsetPreferredService(this);
+        show("Nicht verbunden");
     }
     private void show(String message){CloudService.status=message;state.setText(message);}
-    private void button(LinearLayout root,String text,Runnable action){Button b=new Button(this);b.setText(text);b.setOnClickListener(v->action.run());root.addView(b);}
     @Override protected void onNewIntent(Intent i){super.onNewIntent(i);setIntent(i);handleIntent(i);}
-    private void handleIntent(Intent i){if(i!=null&&i.getData()!=null){String raw=i.getDataString();i.setData(null);confirm(raw);}}
+    private void handleIntent(Intent i){
+        if(i==null)return;
+        if(i.getData()!=null){android.net.Uri uri=i.getData();i.setData(null);startActivityForResult(new Intent(this,CloudPairingActivity.class).setData(uri),PAIRING_REQUEST);}
+    }
     @Override protected void onActivityResult(int request,int result,Intent data){
-        if(request==IMPORT_JSON){
-            if(result==RESULT_OK&&data!=null&&data.getData()!=null){
-                android.net.Uri file=data.getData();
-                new Thread(()->{
-                    try(java.io.InputStream input=getContentResolver().openInputStream(file)){
-                        Pairing pairing=Pairing.readJson(input);runOnUiThread(()->confirm(pairing));
-                    }catch(Exception e){runOnUiThread(()->show("Ungültige Phoenix-JSON-Datei. Bitte eine neue Konfiguration herunterladen."));}
-                },"phoenix-json").start();
-            }
-            return;
-        }
-        IntentResult qr=IntentIntegrator.parseActivityResult(request,result,data);
-        if(qr!=null){if(qr.getContents()!=null)confirm(qr.getContents());}else super.onActivityResult(request,result,data);
-    }
-    private void confirm(String raw){
-        final Pairing p;
-        try{p=new Pairing(raw);}catch(Exception e){show("Ungültiger Phoenix-Kopplungs-QR-Code");return;}
-        confirm(p);
-    }
-    private void confirm(Pairing p){
-        new AlertDialog.Builder(this).setTitle("Telefon koppeln?")
-            .setMessage("Dieser Server erhält Zugriff auf den gewählten NFC-Modus:\n"+p.server+"\nNur mit deinem eigenen Simulator koppeln.")
-            .setNegativeButton("Abbrechen",null).setPositiveButton("Koppeln",(d,which)->{
-                stopService(new Intent(this,CloudService.class));show("Kopplung läuft …");
-                new Thread(()->{
-                    try{
-                        JSONObject reply=new CloudApi(p.server,null).post("redeem",new JSONObject().put("pairing_code",p.code));
-                        String token=reply.getString("bridge_token");if(!token.matches("[A-Za-z0-9_-]{43}"))throw new IllegalArgumentException();
-                        new DeviceVault(this).save(p.server,token);
-                        runOnUiThread(()->{server.setText(p.server);connect();});
-                    }catch(Exception e){runOnUiThread(()->show("Kopplung fehlgeschlagen oder Code abgelaufen. Neuen QR-Code im Simulator erzeugen."));}
-                },"phoenix-pair").start();
-            }).show();
+        super.onActivityResult(request,result,data);
+        if(request==PAIRING_REQUEST&&result==RESULT_OK)connect();
     }
     private void connect(){
         try{
             JSONObject saved=new DeviceVault(this).load();
-            if(saved==null){show("Bitte zuerst den Kopplungs-QR-Code scannen");return;}
+            if(saved==null){startActivityForResult(new Intent(this,CloudPairingActivity.class),PAIRING_REQUEST);return;}
             server.setText(saved.getString("server"));
+            show("Verbindung wird hergestellt …");
             Intent start=new Intent(this,CloudService.class).putExtra("mode",mode);
             if(android.os.Build.VERSION.SDK_INT>=26)startForegroundService(start);else startService(start);
             if("reader".equals(mode))enableReader();else disableReader();

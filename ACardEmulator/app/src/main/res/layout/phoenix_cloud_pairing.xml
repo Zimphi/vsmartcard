@@ -1,0 +1,14 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="@color/cloud_background">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="24dp" android:orientation="vertical">
+        <Button android:id="@+id/cloud_pairing_back" style="@style/CloudSecondaryButton" android:text="@string/cloud_back"/>
+        <ImageView android:layout_width="80dp" android:layout_height="80dp" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:src="@drawable/phoenix_cloud_logo" android:contentDescription="@string/cloud_logo_description"/>
+        <TextView style="@style/CloudHeading" android:layout_marginTop="8dp" android:layout_marginBottom="24dp" android:gravity="center" android:text="@string/cloud_setup_title" android:textSize="24sp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:background="@drawable/cloud_panel">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cloud_setup_help" android:textSize="16sp" android:textColor="@color/cloud_ink"/>
+            <Button android:id="@+id/cloud_scan" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_scan"/>
+            <Button android:id="@+id/cloud_import" style="@style/CloudSecondaryButton" android:text="@string/cloud_import"/>
+            <TextView android:id="@+id/cloud_pairing_message" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/cloud_muted" android:accessibilityLiveRegion="polite"/>
+        </LinearLayout>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="@string/cloud_pairing_note" android:textColor="@color/cloud_muted" android:textSize="14sp"/>
+    </LinearLayout>
+</ScrollView>

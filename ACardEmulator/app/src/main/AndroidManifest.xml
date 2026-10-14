@@ -20,7 +20,8 @@
 
     <application
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/phoenix_launcher"
+        android:roundIcon="@mipmap/phoenix_launcher"
         android:label="@string/phoenix_cloud"
         android:theme="@style/AppTheme" >
         <activity
@@ -28,11 +29,7 @@
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar"
             >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -61,7 +58,11 @@
         </service>
 
         <activity android:name="com.vsmartcard.acardemulator.cloud.CloudActivity" android:exported="true"
-            android:label="@string/phoenix_cloud" android:launchMode="singleTop" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+            android:label="@string/phoenix_cloud" android:launchMode="singleTop" android:theme="@style/CloudTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -69,6 +70,7 @@
                 <data android:scheme="phoenix" android:host="pair"/>
             </intent-filter>
         </activity>
+        <activity android:name="com.vsmartcard.acardemulator.cloud.CloudPairingActivity" android:exported="false" android:label="@string/cloud_setup_title" android:theme="@style/CloudTheme"/>
         <service android:name="com.vsmartcard.acardemulator.cloud.CloudService" android:exported="false" android:foregroundServiceType="connectedDevice"/>
         <service android:name="com.vsmartcard.acardemulator.cloud.CloudHceService" android:exported="true" android:permission="android.permission.BIND_NFC_SERVICE">
             <intent-filter><action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE"/></intent-filter>
