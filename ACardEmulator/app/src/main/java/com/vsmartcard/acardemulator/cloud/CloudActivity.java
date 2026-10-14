@@ -79,6 +79,7 @@ public final class CloudActivity extends Activity {
             Intent start=new Intent(this,CloudService.class).putExtra("mode",mode);
             if(android.os.Build.VERSION.SDK_INT>=26)startForegroundService(start);else startService(start);
             if("reader".equals(mode))enableReader();else disableReader();
+            preferCardService();
         }catch(Exception e){show("Gespeicherte Kopplung nicht verfügbar. Bitte erneut koppeln.");}
     }
     private void enableReader(){
@@ -91,10 +92,17 @@ public final class CloudActivity extends Activity {
         },NfcAdapter.FLAG_READER_NFC_A|NfcAdapter.FLAG_READER_NFC_B|NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,null);
     }
     private void disableReader(){NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);if(nfc!=null)nfc.disableReaderMode(this);}
+    private void preferCardService(){
+        NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);if(nfc==null)return;
+        android.nfc.cardemulation.CardEmulation cards=android.nfc.cardemulation.CardEmulation.getInstance(nfc);
+        if("card".equals(mode))cards.setPreferredService(this,new android.content.ComponentName(this,CloudHceService.class));
+        else cards.unsetPreferredService(this);
+    }
     @Override protected void onResume(){super.onResume();
         CloudService service=CloudService.current;if(service!=null){mode=service.mode;roles.check("reader".equals(mode)?readerChoiceId:cardChoiceId);if("reader".equals(mode))enableReader();}
-        handler.post(refresh);
+        preferCardService();handler.post(refresh);
     }
     @Override protected void onPause(){handler.removeCallbacks(refresh);disableReader();
+        NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);if(nfc!=null)android.nfc.cardemulation.CardEmulation.getInstance(nfc).unsetPreferredService(this);
         CloudService service=CloudService.current;if(service!=null&&"reader".equals(service.mode))service.reader.detach();super.onPause();}
 }
