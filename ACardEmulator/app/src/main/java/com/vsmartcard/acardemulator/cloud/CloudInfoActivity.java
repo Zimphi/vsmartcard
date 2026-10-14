@@ -26,6 +26,9 @@ public final class CloudInfoActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.phoenix_cloud_info);
         ((TextView)findViewById(R.id.cloud_info_version)).setText(getString(R.string.cloud_version,BuildConfig.VERSION_NAME));
+        android.widget.CheckBox developer=findViewById(R.id.cloud_developer_options);
+        developer.setChecked(getSharedPreferences("phoenix-ui",MODE_PRIVATE).getBoolean("developer_options",false));
+        developer.setOnCheckedChangeListener((button,checked)->getSharedPreferences("phoenix-ui",MODE_PRIVATE).edit().putBoolean("developer_options",checked).apply());
         findViewById(R.id.cloud_license).setOnClickListener(v->showLicense());
         findViewById(R.id.cloud_info_back).setOnClickListener(v->finish());
         findViewById(R.id.cloud_website).setOnClickListener(v->{

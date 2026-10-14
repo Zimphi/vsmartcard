@@ -4,17 +4,18 @@
     <color name="cloud_muted">#52627A</color>
     <color name="cloud_blue">#345FC4</color>
     <color name="cloud_green">#23734D</color>
+    <color name="cloud_log_profile">#7452A7</color>
     <color name="cloud_red">#B12B38</color>
     <string name="cloud_title">Phoenix Cloud</string>
     <string name="cloud_logo_description">Phoenix-Logo</string>
     <string name="cloud_pairing_title">Aktuelle Kopplung</string>
     <string name="cloud_not_paired">Noch kein Simulator gekoppelt</string>
-    <string name="cloud_connected">Verbunden · Kopplung aktiv</string>
+    <string name="cloud_connected">Verbunden · Cloud erreichbar</string>
     <string name="cloud_saved_offline">Nicht verbunden · Kopplung gespeichert</string>
     <string name="cloud_unpaired">Nicht verbunden · Bitte zuerst koppeln</string>
     <string name="cloud_mode_title">NFC-Modus</string>
     <string name="cloud_card_mode">Karte simulieren</string>
-    <string name="cloud_reader_mode">Echte NFC-Karte lesen</string>
+    <string name="cloud_reader_mode">Karte lesen</string>
     <string name="cloud_connect">Verbinden</string>
     <string name="cloud_disconnect">Verbindung aufheben</string>
     <string name="cloud_connected_icon">Telefon mit Phoenix Cloud verbunden</string>
@@ -32,6 +33,14 @@
     <style name="CloudHeadingBase">
         <item name="android:layout_width">match_parent</item><item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">16sp</item><item name="android:textStyle">bold</item><item name="android:textColor">@color/cloud_ink</item>
+    </style>
+    <style name="CloudModeTile">
+        <item name="android:layout_width">0dp</item><item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item><item name="android:minHeight">120dp</item>
+        <item name="android:button">@null</item><item name="android:background">@drawable/cloud_mode_tile</item>
+        <item name="android:gravity">center</item><item name="android:padding">12dp</item>
+        <item name="android:drawablePadding">12dp</item><item name="android:textColor">@color/cloud_ink</item>
+        <item name="android:textSize">15sp</item><item name="android:textStyle">bold</item>
     </style>
     <style name="CloudSecondaryButton">
         <item name="android:layout_width">match_parent</item><item name="android:layout_height">wrap_content</item>
@@ -58,4 +67,31 @@
     <string name="cloud_license_notice">Phoenix Cloud ist ein unabhängig weiterentwickelter Fork des Android Smart Card Emulator (ACardEmulator) aus vsmartcard von Frank Morgner und Mitwirkenden. Die Phoenix-Erweiterungen umfassen die Cloud-Anbindung, Kopplung und Oberfläche (Stand: 14.10.2026).\n\nDie App wird unter der ursprünglichen GNU General Public License, Version 3 oder jeder späteren Version (GPL-3.0-or-later), fortgeführt. Du darfst sie unter diesen Bedingungen weitergeben und verändern. Es besteht keine Gewährleistung, auch nicht für Marktgängigkeit oder Eignung für einen bestimmten Zweck. Ursprüngliche Urheberrechts- und Lizenzhinweise bleiben erhalten; enthaltene Drittkomponenten behalten ihre jeweiligen Lizenzen.</string>
     <string name="cloud_source_links">Quellcode dieses Forks:\nhttps://github.com/Zimphi/vsmartcard/tree/codex/phoenix-cloud\n\nUrsprüngliches Projekt:\nhttps://github.com/frankmorgner/vsmartcard</string>
     <string name="cloud_show_license">Vollständige GPL-Lizenz lesen</string>
+    <string name="cloud_nfc_title">NFC-Bereitschaft</string>
+    <string name="cloud_nfc_off">NFC ist ausgeschaltet</string>
+    <string name="cloud_nfc_missing">Dieses Gerät unterstützt kein NFC</string>
+    <string name="cloud_nfc_disconnected">NFC eingeschaltet · zuerst Cloud verbinden</string>
+    <string name="cloud_nfc_card_ready">NFC bereit · Telefon auf den Kartenleser legen</string>
+    <string name="cloud_nfc_no_profile">NFC eingeschaltet · im Simulator ein Profil bereitstellen</string>
+    <string name="cloud_nfc_reader_ready">NFC-Leser bereit · Karte an das Telefon halten</string>
+    <string name="cloud_nfc_unavailable">NFC-Modus konnte nicht aktiviert werden</string>
+    <string name="cloud_communication_title">NFC-Kommunikation</string>
+    <string name="cloud_traffic_idle">Noch keine NFC-Kommunikation</string>
+    <string name="cloud_traffic_active">NFC-Sitzung aktiv · wartet auf Kommando</string>
+    <string name="cloud_traffic_busy">NFC-Kommunikation läuft · APDU wird übertragen</string>
+    <string name="cloud_traffic_ended">NFC-Sitzung beendet</string>
+    <string name="cloud_traffic_failed">NFC-Übertragung fehlgeschlagen · erneut auflegen</string>
+    <string name="cloud_profile_title">Aktives Profil</string>
+    <string name="cloud_profile_none">Kein Profil ausgewählt</string>
+    <string name="cloud_profile_unknown">Profilstatus wird abgefragt …</string>
+    <string name="cloud_profile_legacy">Profil ausgewählt · Details nach Server-Update verfügbar</string>
+    <string name="cloud_profile_offline">Profilstatus nicht aktuell · Cloud nicht verbunden</string>
+    <string name="cloud_profile_detail">%1$s · %2$s · Version %3$d</string>
+    <string name="cloud_reader_card_title">Karte am Telefon</string>
+    <string name="cloud_reader_waiting">Warte auf Karte</string>
+    <string name="cloud_reader_detected">ISO-DEP-Karte erkannt · Profil noch nicht identifiziert</string>
+    <string name="cloud_developer_options">Entwickleroptionen</string>
+    <string name="cloud_developer_help">Zeigt ein farbiges Live-Protokoll auf der Startseite. Nur Diagnoseereignisse, keine Zugangsdaten oder APDU-Nutzdaten. Maximal 120 Einträge im Arbeitsspeicher.</string>
+    <string name="cloud_log_title">Live-Protokoll</string>
+    <string name="cloud_log_empty">Noch keine Diagnoseereignisse.</string>
 </resources>

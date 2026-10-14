@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 public final class CloudService extends Service {
     static volatile CloudService current;
     static volatile String status="Nicht verbunden";
-    final PhoneReader reader=new PhoneReader();
+    final NfcStatus nfcStatus=new NfcStatus();
+    final PhoneReader reader=new PhoneReader(nfcStatus);
     volatile String mode="card";
     CloudApi api;
     private ScheduledExecutorService worker;
@@ -39,8 +40,9 @@ public final class CloudService extends Service {
         if(i==null){stopSelf();return START_NOT_STICKY;}
         String requested=i.getStringExtra("mode");
         if(!"card".equals(requested)&&!"reader".equals(requested)){stopSelf();return START_NOT_STICKY;}
-        if(current==this&&worker!=null){if(!mode.equals(requested)){reader.detach();worker.execute(api::end);}mode=requested;lastBeat=0;return START_NOT_STICKY;}
+        if(current==this&&worker!=null){if(!mode.equals(requested)){reader.detach();nfcStatus.reset();api.profile=null;worker.execute(api::end);}mode=requested;lastBeat=0;return START_NOT_STICKY;}
         mode=requested;
+        CloudLog.add("CLOUD","Verbindung wird hergestellt",false);
         try{
             JSONObject saved=new DeviceVault(this).load();if(saved==null)throw new IllegalStateException();
             api=new CloudApi(saved.getString("server"),saved.getString("token"));
@@ -63,8 +65,9 @@ public final class CloudService extends Service {
             if(now-lastBeat>=5000||lastBeat==0){lastBeat=now;
                 api.heartbeat(new JSONObject().put("reader_connected","card".equals(mode)&&enabled)
                     .put("device_kind","android").put("mode",mode).put("nfc_enabled",enabled));
+                if(!connected())CloudLog.add("CLOUD","Cloud-Verbindung bestätigt",false);
                 lastContact=android.os.SystemClock.elapsedRealtime();
-                status=enabled?("card".equals(mode)?"Online · Kartenmodus":"Online · Lesemodus") :"Online · NFC ausgeschaltet";
+                status="Cloud erreichbar";
             }
             if("reader".equals(mode)){
                 if(now-lastInventory>=5000||lastInventory==0){lastInventory=now;inventory();}
@@ -77,7 +80,7 @@ public final class CloudService extends Service {
                 }
             }
         }catch(CloudApi.Denied e){lastContact=0;status="Gerätefreigabe widerrufen · erneut koppeln";new DeviceVault(this).clear();stopSelf();}
-        catch(Exception e){lastContact=0;status="Offline · Verbindung wird erneut geprüft";}
+        catch(Exception e){if(lastContact>0)CloudLog.add("CLOUD","Cloud-Verbindung unterbrochen",true);lastContact=0;nfcStatus.ended();status="Offline · Verbindung wird erneut geprüft";}
     }
     private void inventory() throws Exception {
         JSONArray list=new JSONArray();
@@ -85,6 +88,7 @@ public final class CloudService extends Service {
         reader.selection(api.post("reader-inventory",new JSONObject().put("instance",instance).put("readers",list)));
     }
     @Override public void onDestroy(){
+        CloudLog.add("CLOUD","Verbindung beendet",false);
         current=null;if(worker!=null)worker.shutdownNow();reader.detach();
         if(api!=null)new Thread(api::end,"phoenix-close").start();
         status="Nicht verbunden";stopForeground(true);super.onDestroy();

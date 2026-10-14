@@ -24,12 +24,14 @@ public class CloudUiTest {
             assertEquals("✕",((TextView)activity.findViewById(R.id.cloud_status_mark)).getText().toString());
             assertEquals(activity.getString(R.string.cloud_saved_offline),((TextView)activity.findViewById(R.id.cloud_pairing_status)).getText().toString());
             ((TextView)activity.findViewById(R.id.cloud_state)).setText("Nicht verbunden");
+            activity.renderDetails(false,true,true,false,null,false,NfcStatus.State.WAITING);
             snapshot(activity,"cloud-ui-disconnected.png");
             activity.renderConnection(true,true);
             assertEquals("Verbindung aufheben",((TextView)activity.findViewById(R.id.cloud_connection_action)).getText().toString());
             assertEquals("✓",((TextView)activity.findViewById(R.id.cloud_status_mark)).getText().toString());
             assertEquals(activity.getString(R.string.cloud_connected_icon),activity.findViewById(R.id.cloud_connection_icon).getContentDescription());
             ((TextView)activity.findViewById(R.id.cloud_state)).setText("Online · Kartenmodus");
+            activity.renderDetails(true,true,true,true,new CloudApi.Profile(true,"erika-mustermann","eid",1),false,NfcStatus.State.SESSION);
             snapshot(activity,"cloud-ui-connected.png");
             activity.renderConnection(false,false);
             assertEquals(activity.getString(R.string.cloud_unpaired),((TextView)activity.findViewById(R.id.cloud_pairing_status)).getText().toString());
@@ -48,6 +50,15 @@ public class CloudUiTest {
         android.app.Instrumentation.ActivityMonitor monitor=instrumentation.addMonitor(CloudPairingActivity.class.getName(),null,false);
         instrumentation.runOnMainSync(()->{
             assertEquals("Version "+BuildConfig.VERSION_NAME,((TextView)activity.findViewById(R.id.cloud_version)).getText().toString());
+            android.widget.RadioButton read=activity.findViewById(R.id.cloud_reader_mode);
+            android.widget.RadioButton simulate=activity.findViewById(R.id.cloud_card_mode);
+            assertEquals("Karte lesen",read.getText().toString());
+            assertEquals("Karte simulieren",simulate.getText().toString());
+            assertTrue(read.getRight()<=simulate.getLeft());
+            assertNotNull(read.getCompoundDrawables()[1]);
+            assertNotNull(simulate.getCompoundDrawables()[1]);
+            read.performClick();assertTrue(read.isChecked());assertFalse(simulate.isChecked());
+            simulate.performClick();assertTrue(simulate.isChecked());assertFalse(read.isChecked());
             assertNull(activity.findViewById(R.id.cloud_scan));
             assertNull(activity.findViewById(R.id.cloud_import));
             activity.findViewById(R.id.cloud_manage_pairing).performClick();
@@ -102,6 +113,47 @@ public class CloudUiTest {
         });
         instrumentation.removeMonitor(monitor);
         instrumentation.runOnMainSync(activity::finish);
+    }
+    @Test public void cloudNfcAndProfileRemainIndependentAndDeveloperLogIsOptIn(){
+        android.app.Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();
+        android.content.Context context=instrumentation.getTargetContext();
+        android.content.SharedPreferences preferences=context.getSharedPreferences("phoenix-ui",0);
+        boolean original=preferences.getBoolean("developer_options",false);
+        CloudActivity activity=(CloudActivity)instrumentation.startActivitySync(new Intent(context,CloudActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        try{
+            instrumentation.runOnMainSync(()->{
+                activity.renderDetails(true,true,false,false,new CloudApi.Profile(true,"erika-mustermann","eid",1),false,NfcStatus.State.WAITING);
+                assertEquals(activity.getString(R.string.cloud_nfc_off),((TextView)activity.findViewById(R.id.cloud_nfc_status)).getText().toString());
+                assertTrue(((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString().contains("erika-mustermann"));
+                activity.renderDetails(true,true,true,true,new CloudApi.Profile(true,null,null,0),false,NfcStatus.State.TRANSFER);
+                assertEquals(activity.getString(R.string.cloud_profile_legacy),((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString());
+                assertEquals(activity.getString(R.string.cloud_traffic_busy),((TextView)activity.findViewById(R.id.cloud_traffic_status)).getText().toString());
+                activity.renderDetails(false,true,true,false,new CloudApi.Profile(true,"old","eid",1),false,NfcStatus.State.SESSION);
+                assertEquals(activity.getString(R.string.cloud_profile_offline),((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString());
+                ((android.widget.RadioButton)activity.findViewById(R.id.cloud_reader_mode)).performClick();
+                activity.renderDetails(true,true,true,true,null,true,NfcStatus.State.WAITING);
+                assertEquals(activity.getString(R.string.cloud_reader_detected),((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString());
+            });
+            android.app.Instrumentation.ActivityMonitor monitor=instrumentation.addMonitor(CloudInfoActivity.class.getName(),null,false);
+            instrumentation.runOnMainSync(()->activity.findViewById(R.id.cloud_logo).performClick());
+            CloudInfoActivity info=(CloudInfoActivity)instrumentation.waitForMonitorWithTimeout(monitor,5000);assertNotNull(info);
+            instrumentation.runOnMainSync(()->{
+                android.widget.CheckBox developer=info.findViewById(R.id.cloud_developer_options);
+                developer.setChecked(true);assertTrue(preferences.getBoolean("developer_options",false));
+                CloudLog.add("CLOUD","Cloud-Verbindung bestätigt",false);
+                info.findViewById(R.id.cloud_info_back).performClick();
+            });
+            instrumentation.waitForIdleSync();
+            instrumentation.runOnMainSync(()->{
+                assertEquals(View.VISIBLE,activity.findViewById(R.id.cloud_log_panel).getVisibility());
+                assertTrue(((TextView)activity.findViewById(R.id.cloud_log_text)).getText().toString().contains("[CLOUD]"));
+                snapshot(activity,"cloud-ui-developer.png");
+            });
+            instrumentation.removeMonitor(monitor);
+        }finally{
+            preferences.edit().putBoolean("developer_options",original).commit();
+            instrumentation.runOnMainSync(activity::finish);
+        }
     }
     private static void snapshot(android.app.Activity activity,String name){
         ViewGroup frame=activity.findViewById(android.R.id.content);

@@ -11,15 +11,27 @@
             </LinearLayout>
             <TextView android:id="@+id/cloud_state" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/cloud_muted"/>
         </LinearLayout>
+        <TextView android:id="@+id/cloud_nfc_title" style="@style/CloudHeading" android:layout_marginTop="16dp" android:text="@string/cloud_nfc_title"/>
+        <TextView android:id="@+id/cloud_nfc_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="@color/cloud_muted" android:accessibilityLiveRegion="polite"/>
+        <TextView android:id="@+id/cloud_traffic_title" style="@style/CloudHeading" android:layout_marginTop="16dp" android:text="@string/cloud_communication_title"/>
+        <TextView android:id="@+id/cloud_traffic_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="@color/cloud_muted" android:accessibilityLiveRegion="polite"/>
+        <TextView android:id="@+id/cloud_profile_title" style="@style/CloudHeading" android:layout_marginTop="16dp" android:text="@string/cloud_profile_title"/>
+        <TextView android:id="@+id/cloud_profile_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="@color/cloud_muted" android:accessibilityLiveRegion="polite"/>
         <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_mode_title"/>
-        <RadioGroup android:id="@+id/cloud_roles" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp">
-            <RadioButton android:id="@+id/cloud_card_mode" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/cloud_card_mode" android:textColor="@color/cloud_ink" android:buttonTint="@color/cloud_blue"/>
-            <RadioButton android:id="@+id/cloud_reader_mode" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/cloud_reader_mode" android:textColor="@color/cloud_ink" android:buttonTint="@color/cloud_blue"/>
+        <RadioGroup android:id="@+id/cloud_roles" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal" android:baselineAligned="false">
+            <RadioButton android:id="@+id/cloud_reader_mode" style="@style/CloudModeTile" android:layout_marginEnd="6dp" android:text="@string/cloud_reader_mode" android:drawableTop="@drawable/cloud_mode_read"/>
+            <RadioButton android:id="@+id/cloud_card_mode" style="@style/CloudModeTile" android:layout_marginStart="6dp" android:text="@string/cloud_card_mode" android:drawableTop="@drawable/cloud_mode_simulate"/>
         </RadioGroup>
         <ImageView android:id="@+id/cloud_connection_icon" android:layout_width="64dp" android:layout_height="64dp" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:src="@drawable/cloud_disconnected" android:contentDescription="@string/cloud_disconnected_icon"/>
         <Button android:id="@+id/cloud_connection_action" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="8dp" android:text="@string/cloud_connect" android:textAllCaps="false" android:textSize="16sp" android:textColor="#FFFFFF" android:backgroundTint="@color/cloud_blue"/>
         <Button android:id="@+id/cloud_manage_pairing" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_manage_pairing"/>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/cloud_note" android:textColor="@color/cloud_muted" android:textSize="13sp"/>
+        <LinearLayout android:id="@+id/cloud_log_panel" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="24dp" android:padding="16dp" android:background="@drawable/cloud_panel" android:visibility="gone">
+            <TextView style="@style/CloudHeading" android:text="@string/cloud_log_title"/>
+            <ScrollView android:id="@+id/cloud_log_scroll" android:layout_width="match_parent" android:layout_height="220dp" android:layout_marginTop="12dp" android:fillViewport="true">
+                <TextView android:text="@string/cloud_log_empty" android:id="@+id/cloud_log_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:fontFamily="monospace" android:textSize="12sp" android:textColor="@color/cloud_ink" android:lineSpacingExtra="4dp"/>
+            </ScrollView>
+        </LinearLayout>
         <TextView android:id="@+id/cloud_version" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:gravity="center" android:textColor="@color/cloud_muted" android:textSize="12sp"/>
     </LinearLayout>
 </ScrollView>

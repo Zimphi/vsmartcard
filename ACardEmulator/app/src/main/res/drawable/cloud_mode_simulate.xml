@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="48dp" android:height="48dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:pathData="M9,6 H21 A7,7 0,0 1,28,13 V51 A7,7 0,0 1,21,58 H9 A7,7 0,0 1,2,51 V13 A7,7 0,0 1,9,6 Z" android:strokeColor="@color/cloud_blue" android:strokeWidth="2.5" android:fillColor="#FFFFFF"/>
+    <path android:pathData="M9,11 H21 A3,3 0,0 1,24,14 V48 A3,3 0,0 1,21,51 H9 A3,3 0,0 1,6,48 V14 A3,3 0,0 1,9,11 Z" android:fillColor="@color/cloud_blue" android:fillAlpha="0.12"/>
+    <path android:pathData="M16.2,15 A1.2,1.2 0,1 1,13.8,15 A1.2,1.2 0,1 1,16.2,15 Z" android:fillColor="@color/cloud_blue"/>
+    <path android:pathData="M12,54 H18" android:strokeColor="@color/cloud_blue" android:strokeWidth="2" android:strokeLineCap="round"/>
+    <path android:pathData="M30,25 V21 A4,4 0,0 1,34,17 H41 M51,17 H58 A4,4 0,0 1,62,21 V25 M62,33 V37 A4,4 0,0 1,58,41 H51 M41,41 H34 A4,4 0,0 1,30,37 V33" android:strokeColor="@color/cloud_blue" android:strokeWidth="2.5" android:strokeLineJoin="round" android:strokeLineCap="round" android:fillColor="@android:color/transparent"/>
+    <path android:pathData="M43,25 A3,3 0,1 1,37,25 A3,3 0,1 1,43,25 Z M35,35 C35,30 45,30 45,35 M50,24 H57 M50,29 H57 M50,34 H54" android:strokeColor="@color/cloud_blue" android:strokeWidth="2" android:strokeLineJoin="round" android:strokeLineCap="round" android:fillColor="@android:color/transparent"/>
+    <path android:pathData="M34,50 H54 M49,45 L54,50 L49,55" android:strokeColor="@color/cloud_blue" android:strokeWidth="2.5" android:strokeLineJoin="round" android:strokeLineCap="round" android:fillColor="@android:color/transparent"/>
+</vector>

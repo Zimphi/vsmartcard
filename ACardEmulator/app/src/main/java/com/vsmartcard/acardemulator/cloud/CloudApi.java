@@ -13,6 +13,24 @@ class CloudApi {
     private final String token;
     private JSONObject session;
     private String openedId;
+    static final class Profile {
+        final boolean active;final String id,kind;final int version;
+        Profile(boolean active,String id,String kind,int version){this.active=active;this.id=id;this.kind=kind;this.version=version;}
+    }
+    volatile Profile profile;
+    private void updateProfile(JSONObject packet){
+        JSONObject value=packet.optJSONObject("profile");
+        boolean active=packet.optBoolean("active");
+        if(!active){if(profile==null||profile.active)CloudLog.add("PROFIL","Kein Profil ausgewählt",false);profile=new Profile(false,null,null,0);return;}
+        String id=value==null?"":value.optString("profile_id","");
+        String kind=value==null?"":value.optString("kind","");
+        int version=value==null?0:value.optInt("version",0);
+        boolean valid=!id.isEmpty()&&id.length()<=200&&("eid".equals(kind)||"epassport".equals(kind))&&version>0;
+        Profile previous=profile;
+        if(previous==null||!previous.active||!java.util.Objects.equals(previous.id,valid?id:null)||previous.version!=(valid?version:0))
+            CloudLog.add("PROFIL",valid?"Aktives Profil aktualisiert":"Profil ausgewählt · Details fehlen",false);
+        profile=new Profile(true,valid?id:null,valid?kind:null,valid?version:0);
+    }
     CloudApi(String server,String token) { this.server=server;this.token=token; }
     JSONObject post(String endpoint,JSONObject body) throws Exception {
         HttpsURLConnection c=(HttpsURLConnection)new URL(server+"/api/vsmartcard/"+endpoint).openConnection();
@@ -51,11 +69,13 @@ class CloudApi {
     }
     synchronized void heartbeat(JSONObject body) throws Exception {
         JSONObject current=post("status",body);
+        updateProfile(current);
         if(openedId!=null&&!openedId.equals(current.getString("session_id"))){session=null;openedId=null;}
     }
     synchronized void begin() throws Exception {
         session=null;openedId=null;
         JSONObject result=post("open",new JSONObject());
+        updateProfile(result);
         openedId=result.getString("session_id");UUID.fromString(openedId);
         command("mount",null);
     }

@@ -11,6 +11,10 @@ final class PhoneReader {
     static final String ID;
     static { try { ID=CloudApi.encode(MessageDigest.getInstance("SHA-256").digest("phoenix-android-nfc-v1".getBytes("UTF-8"))).toLowerCase(java.util.Locale.ROOT); }
         catch(Exception e){throw new ExceptionInInitializerError(e);} }
+    private final NfcStatus activity;
+    private volatile boolean detected;
+    PhoneReader(NfcStatus activity){this.activity=activity;}
+    boolean detected(){return detected;}
     private IsoDep card;
     private byte[] atr;
     private String session, epoch;
@@ -30,9 +34,10 @@ final class PhoneReader {
             atr=new byte[5+historical.length];atr[0]=0x3b;atr[1]=(byte)(0x80+historical.length);atr[2]=(byte)0x80;atr[3]=1;
             System.arraycopy(historical,0,atr,4,historical.length);
             for(int i=1;i<atr.length-1;i++)atr[atr.length-1]^=atr[i];
+            detected=true;CloudLog.add("NFC","ISO-DEP-Karte erkannt",false);
         }catch(Exception e){detach();throw e;}
     }
-    synchronized void detach(){ if(card!=null){try{card.close();}catch(Exception ignored){}}card=null;atr=null;session=null; }
+    synchronized void detach(){ detected=false;activity.ended();if(card!=null){try{card.close();}catch(Exception ignored){}}card=null;atr=null;session=null; }
     synchronized boolean present(){return card!=null&&card.isConnected();}
     synchronized void selection(JSONObject state) throws Exception {
         String next=state.optString("epoch","");
@@ -51,10 +56,12 @@ final class PhoneReader {
             return new JSONObject().put("ok",true).put("atr",CloudApi.encode(atr));
         }
         if(!"apdu".equals(op)||session==null||!session.equals(job.getString("session_id")))throw new java.io.IOException();
+        long token=activity.started();
         try{
             byte[] response=card.transceive(CloudApi.hex(job.getString("hex"),4,65542));
             if(response.length<2||response.length>65535)throw new java.io.IOException();
+            activity.completed(token);
             return new JSONObject().put("ok",true).put("hex",CloudApi.encode(response));
-        }catch(Exception e){detach();throw e;}
+        }catch(Exception e){activity.failed(token);detach();throw e;}
     }
 }

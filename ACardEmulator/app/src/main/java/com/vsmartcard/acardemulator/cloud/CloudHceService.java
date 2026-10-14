@@ -18,20 +18,22 @@ public final class CloudHceService extends HostApduService {
         CloudService service=CloudService.current;
         if(failed||service==null||!"card".equals(service.mode))return new byte[]{0x69,(byte)0x85};
         int current=generation;
+        long token=service.nfcStatus.started();
         try{worker.execute(()->{
             if(current!=generation)return;
             byte[] response;
-            try{response=service.api.apdu(apdu);}
-            catch(Exception e){response=new byte[]{0x64,0};main.post(()->{if(current==generation)failed=true;});}
+            try{response=service.api.apdu(apdu);service.nfcStatus.completed(token);}
+            catch(Exception e){service.nfcStatus.failed(token);response=new byte[]{0x64,0};main.post(()->{if(current==generation)failed=true;});}
             byte[] result=response;
             main.post(()->{if(current==generation)sendResponseApdu(result);});
-        });}catch(java.util.concurrent.RejectedExecutionException e){failed=true;return new byte[]{0x64,0};}
+        });}catch(java.util.concurrent.RejectedExecutionException e){service.nfcStatus.failed(token);failed=true;return new byte[]{0x64,0};}
         return null;
     }
     @Override public void onDeactivated(int reason){
         generation++;failed=false;
         CloudService service=CloudService.current;
+        if(service!=null)service.nfcStatus.ended();
         if(service!=null)try{worker.execute(service.api::end);}catch(java.util.concurrent.RejectedExecutionException ignored){}
     }
-    @Override public void onDestroy(){generation++;worker.shutdownNow();super.onDestroy();}
+    @Override public void onDestroy(){CloudService service=CloudService.current;if(service!=null)service.nfcStatus.ended();generation++;worker.shutdownNow();super.onDestroy();}
 }

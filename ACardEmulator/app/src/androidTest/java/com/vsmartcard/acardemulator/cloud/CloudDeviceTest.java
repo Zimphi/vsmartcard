@@ -35,10 +35,11 @@ public class CloudDeviceTest {
         final List<String> calls=new ArrayList<>();
         long revision;
         boolean uncertain;
+        JSONObject statusPacket;
         String id="12345678-1234-4234-8234-123456789abc";
         FakeApi(){super("https://example.org",null);}
         @Override JSONObject post(String endpoint,JSONObject body)throws Exception{
-            if(endpoint.equals("status")){calls.add("status");return new JSONObject().put("session_id",id);}
+            if(endpoint.equals("status")){calls.add("status");return statusPacket!=null?statusPacket:new JSONObject().put("session_id",id).put("active",true);}
             if(endpoint.equals("open")){calls.add("open");revision=0;return new JSONObject().put("session_id",id);}
             String op=body.getString("operation");calls.add(op);
             if(uncertain&&op.equals("apdu"))throw new java.io.IOException();
@@ -46,6 +47,17 @@ public class CloudDeviceTest {
             return new JSONObject().put("session",new JSONObject().put("id",id).put("revision",++revision).put("checkpoint","sealed"))
                 .put("apdu_response","9000");
         }
+    }
+    @Test public void profileMetadataIsOptionalAndClearedWhenServerRemovesSelection()throws Exception{
+        FakeApi api=new FakeApi();api.heartbeat(new JSONObject());
+        assertTrue(api.profile.active);assertNull(api.profile.id);
+        api.statusPacket=new JSONObject().put("session_id",api.id).put("active",true).put("profile",
+            new JSONObject().put("profile_id","erika-mustermann").put("kind","eid").put("version",1));
+        api.heartbeat(new JSONObject());assertEquals("erika-mustermann",api.profile.id);assertEquals("eid",api.profile.kind);
+        api.statusPacket.getJSONObject("profile").put("kind","unknown");
+        api.heartbeat(new JSONObject());assertNull(api.profile.id);
+        api.statusPacket.put("active",false);api.heartbeat(new JSONObject());
+        assertFalse(api.profile.active);assertNull(api.profile.id);
     }
     @Test public void cardSessionMountsOnceAndAdvancesEveryApdu()throws Exception{
         FakeApi api=new FakeApi();

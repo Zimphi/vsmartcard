@@ -1,6 +1,6 @@
 # Android Smart Card Emulator
 
-## Phoenix Cloud · 4.3.1-phoenix
+## Phoenix Cloud · 4.5-phoenix
 
 The Phoenix screen displays the centered Phoenix logo and the currently paired
 simulator. A green check marks a fresh, successful cloud contact; a red cross
@@ -17,6 +17,24 @@ status, paired simulator and an HTTPS link to epassport-simulator.de.
 Connection freshness has a JVM regression test. Device tests verify both screen
 states; the connected Android phone also passed real connect, disconnect and
 reconnect checks without enrolling again.
+
+## 4.5 · 2026-10-14
+
+Cloud contact, NFC readiness and APDU/session activity are displayed separately.
+Selected profile metadata comes from the token-protected device status response;
+older servers explicitly show that profile details are unavailable. Reader mode
+shows card detection without claiming the card profile has been identified.
+The information page has an opt-in “Entwickleroptionen” checkbox for a tagged,
+colored live log on the main page (120 in-memory entries; no credentials or APDU
+payloads). NFC activity ends on deactivation or disconnect; late responses cannot
+restore an ended session. The profile metadata API change is prepared locally;
+no Vercel deployment is performed as part of this Android UI update.
+
+## 4.4 · 2026-10-14
+
+The NFC mode selector now uses two side-by-side tiles, “Karte lesen” and
+“Karte simulieren”, with matching vector icons and an explicit selected border.
+Native radio-button semantics and the existing mode-switch behavior are preserved.
 
 ## 4.3.1 · 2026-10-14
 
