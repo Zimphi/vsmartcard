@@ -49,6 +49,10 @@ class CloudApi {
         }
         return result;
     }
+    synchronized void heartbeat(JSONObject body) throws Exception {
+        JSONObject current=post("status",body);
+        if(openedId!=null&&!openedId.equals(current.getString("session_id"))){session=null;openedId=null;}
+    }
     synchronized void begin() throws Exception {
         session=null;openedId=null;
         JSONObject result=post("open",new JSONObject());

@@ -51,7 +51,7 @@ public final class CloudService extends Service {
             long now=android.os.SystemClock.elapsedRealtime();
             NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);boolean enabled=nfc!=null&&nfc.isEnabled();
             if(now-lastBeat>=5000||lastBeat==0){lastBeat=now;
-                api.post("status",new JSONObject().put("reader_connected","card".equals(mode)&&enabled)
+                api.heartbeat(new JSONObject().put("reader_connected","card".equals(mode)&&enabled)
                     .put("device_kind","android").put("mode",mode).put("nfc_enabled",enabled));
                 status=enabled?("card".equals(mode)?"Online · Kartenmodus":"Online · Lesemodus") :"Online · NFC ausgeschaltet";
             }

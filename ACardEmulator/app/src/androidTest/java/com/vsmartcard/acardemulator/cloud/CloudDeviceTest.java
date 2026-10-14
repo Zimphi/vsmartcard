@@ -25,9 +25,10 @@ public class CloudDeviceTest {
         final List<String> calls=new ArrayList<>();
         long revision;
         boolean uncertain;
-        final String id="12345678-1234-4234-8234-123456789abc";
+        String id="12345678-1234-4234-8234-123456789abc";
         FakeApi(){super("https://example.org",null);}
         @Override JSONObject post(String endpoint,JSONObject body)throws Exception{
+            if(endpoint.equals("status")){calls.add("status");return new JSONObject().put("session_id",id);}
             if(endpoint.equals("open")){calls.add("open");revision=0;return new JSONObject().put("session_id",id);}
             String op=body.getString("operation");calls.add(op);
             if(uncertain&&op.equals("apdu"))throw new java.io.IOException();
@@ -47,5 +48,11 @@ public class CloudDeviceTest {
         FakeApi api=new FakeApi();api.uncertain=true;
         try{api.apdu(new byte[]{0,(byte)0xa4,4,0});fail("uncertain response accepted");}catch(java.io.IOException expected){}
         assertEquals(java.util.Arrays.asList("open","mount","apdu"),api.calls);
+    }
+    @Test public void changedProfileDiscardsTheOldCardSession()throws Exception{
+        FakeApi api=new FakeApi();api.apdu(new byte[]{0,(byte)0xa4,4,0});
+        api.id="22345678-1234-4234-8234-123456789abc";
+        api.heartbeat(new JSONObject());api.apdu(new byte[]{0,(byte)0xa4,4,0});
+        assertEquals(java.util.Arrays.asList("open","mount","apdu","status","open","mount","apdu"),api.calls);
     }
 }
