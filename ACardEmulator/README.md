@@ -1,6 +1,6 @@
 # Android Smart Card Emulator
 
-## Phoenix Cloud · 4.2-phoenix
+## Phoenix Cloud · 4.3-phoenix
 
 The Phoenix screen displays the centered Phoenix logo and the currently paired
 simulator. A green check marks a fresh, successful cloud contact; a red cross
@@ -10,7 +10,9 @@ Cloud/phone vector icons and a single contextual button switch between
 QR enrollment and JSON configuration import live on a separate “Gerät koppeln”
 page, reached through “Kopplung verwalten”. The main page displays the installed
 version. The launcher opens Phoenix Cloud directly and uses a Phoenix adaptive
-icon; both pages and their dialogs share the same theme.
+icon; all pages and their dialogs share the same theme. Tapping the Phoenix
+logo opens an information page with the installed version, live connection
+status, paired simulator and an HTTPS link to epassport-simulator.de.
 
 Connection freshness has a JVM regression test. Device tests verify both screen
 states; the connected Android phone also passed real connect, disconnect and

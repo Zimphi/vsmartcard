@@ -70,6 +70,7 @@
                 <data android:scheme="phoenix" android:host="pair"/>
             </intent-filter>
         </activity>
+        <activity android:name="com.vsmartcard.acardemulator.cloud.CloudInfoActivity" android:exported="false" android:label="@string/cloud_about" android:theme="@style/CloudTheme"/>
         <activity android:name="com.vsmartcard.acardemulator.cloud.CloudPairingActivity" android:exported="false" android:label="@string/cloud_setup_title" android:theme="@style/CloudTheme"/>
         <service android:name="com.vsmartcard.acardemulator.cloud.CloudService" android:exported="false" android:foregroundServiceType="connectedDevice"/>
         <service android:name="com.vsmartcard.acardemulator.cloud.CloudHceService" android:exported="true" android:permission="android.permission.BIND_NFC_SERVICE">

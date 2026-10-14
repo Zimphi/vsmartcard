@@ -1,0 +1,16 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="@color/cloud_background">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+        <Button android:id="@+id/cloud_info_back" style="@style/CloudSecondaryButton" android:text="@string/cloud_back"/>
+        <ImageView android:layout_width="96dp" android:layout_height="96dp" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:src="@drawable/phoenix_cloud_logo" android:contentDescription="@string/cloud_logo_description" android:scaleType="fitCenter"/>
+        <TextView style="@style/CloudHeading" android:layout_marginTop="8dp" android:gravity="center" android:text="@string/cloud_about" android:textSize="24sp"/>
+        <TextView android:id="@+id/cloud_info_version" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:layout_marginBottom="24dp" android:gravity="center" android:textColor="@color/cloud_muted" android:textSize="16sp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:background="@drawable/cloud_panel">
+            <TextView style="@style/CloudHeading" android:text="@string/cloud_connection_title"/>
+            <TextView android:id="@+id/cloud_info_server" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="15sp" android:textColor="@color/cloud_muted"/>
+            <TextView android:id="@+id/cloud_info_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:textSize="16sp" android:textStyle="bold" android:accessibilityLiveRegion="polite"/>
+            <TextView android:id="@+id/cloud_info_detail" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/cloud_muted"/>
+        </LinearLayout>
+        <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_website_title"/>
+        <Button android:id="@+id/cloud_website" style="@style/CloudSecondaryButton" android:layout_marginTop="8dp" android:text="@string/cloud_website_address"/>
+    </LinearLayout>
+</ScrollView>

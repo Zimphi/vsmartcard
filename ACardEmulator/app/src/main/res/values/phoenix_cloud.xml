@@ -46,4 +46,10 @@
         <item name="android:statusBarColor">@color/cloud_background</item><item name="android:navigationBarColor">@color/cloud_ink</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
+    <string name="cloud_about">Über Phoenix Cloud</string>
+    <string name="cloud_open_about">App-Informationen öffnen</string>
+    <string name="cloud_connection_title">Verbindung</string>
+    <string name="cloud_website_title">Online-Simulator</string>
+    <string name="cloud_website_address">epassport-simulator.de</string>
+    <string name="cloud_no_browser">Kein Browser zum Öffnen der Webseite verfügbar.</string>
 </resources>

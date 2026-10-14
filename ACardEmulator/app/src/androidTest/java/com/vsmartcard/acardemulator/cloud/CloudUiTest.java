@@ -64,6 +64,35 @@ public class CloudUiTest {
         instrumentation.removeMonitor(monitor);
         instrumentation.runOnMainSync(activity::finish);
     }
+    @Test public void logoOpensLiveInfoAndWebsiteUsesHttpsWithoutCredentials() {
+        android.app.Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();
+        CloudActivity activity=(CloudActivity)instrumentation.startActivitySync(new Intent(instrumentation.getTargetContext(),CloudActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        instrumentation.waitForIdleSync();
+        android.app.Instrumentation.ActivityMonitor monitor=instrumentation.addMonitor(CloudInfoActivity.class.getName(),null,false);
+        instrumentation.runOnMainSync(()->activity.findViewById(R.id.cloud_logo).performClick());
+        CloudInfoActivity info=(CloudInfoActivity)instrumentation.waitForMonitorWithTimeout(monitor,5000);
+        assertNotNull("Logo did not open app information",info);
+        instrumentation.waitForIdleSync();
+        instrumentation.runOnMainSync(()->{
+            assertEquals("Version "+BuildConfig.VERSION_NAME,((TextView)info.findViewById(R.id.cloud_info_version)).getText().toString());
+            String status=((TextView)info.findViewById(R.id.cloud_info_status)).getText().toString();
+            assertTrue(status.contains("Verbunden")||status.contains("Nicht verbunden"));
+            Intent website=CloudInfoActivity.websiteIntent();
+            assertEquals(Intent.ACTION_VIEW,website.getAction());
+            assertEquals("https://epassport-simulator.de",website.getDataString());
+            assertNull(website.getExtras());
+            android.content.IntentFilter filter=new android.content.IntentFilter(Intent.ACTION_VIEW);
+            filter.addDataScheme("https");filter.addDataAuthority("epassport-simulator.de",null);
+            android.app.Instrumentation.ActivityMonitor browser=instrumentation.addMonitor(filter,new android.app.Instrumentation.ActivityResult(0,null),true);
+            info.findViewById(R.id.cloud_website).performClick();
+            assertEquals("Website button did not open the expected URL",1,browser.getHits());
+            instrumentation.removeMonitor(browser);
+            snapshot(info,"cloud-ui-info.png");
+            info.findViewById(R.id.cloud_info_back).performClick();
+        });
+        instrumentation.removeMonitor(monitor);
+        instrumentation.runOnMainSync(activity::finish);
+    }
     private static void snapshot(android.app.Activity activity,String name){
         ViewGroup frame=activity.findViewById(android.R.id.content);
         View view=((ViewGroup)frame.getChildAt(0)).getChildAt(0);

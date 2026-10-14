@@ -18,6 +18,7 @@ public final class CloudPairingActivity extends Activity {
         super.onCreate(saved);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.phoenix_cloud_pairing);
+        findViewById(R.id.cloud_logo).setOnClickListener(v->startActivity(new Intent(this,CloudInfoActivity.class)));
         state=findViewById(R.id.cloud_pairing_message);
         findViewById(R.id.cloud_pairing_back).setOnClickListener(v->finish());
         findViewById(R.id.cloud_scan).setOnClickListener(v->new IntentIntegrator(this).setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
