@@ -181,6 +181,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings);
+            findPreference("phoenix_cloud").setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(getActivity(), com.vsmartcard.acardemulator.cloud.CloudActivity.class));return true;
+            });
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences

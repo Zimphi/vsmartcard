@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <Preference android:key="phoenix_cloud" android:title="@string/phoenix_cloud" android:summary="Online-Simulator koppeln · NFC-Karte oder NFC-Leser"/>
+
     <ListPreference
         android:key="emulator"
         android:title="Smart Card Emulator"
