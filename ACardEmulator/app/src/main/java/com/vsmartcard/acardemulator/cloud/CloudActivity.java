@@ -34,7 +34,7 @@ public final class CloudActivity extends CloudScreen {
         findViewById(R.id.cloud_help).setOnClickListener(v->startActivity(new Intent(this,CloudHelpActivity.class)));
         ((TextView)findViewById(R.id.cloud_language_button)).setText(CloudLanguage.language(this).toUpperCase(java.util.Locale.ROOT));
         findViewById(R.id.cloud_language_button).setOnClickListener(v->chooseLanguage());
-        findViewById(R.id.cloud_open_diagnostics).setOnClickListener(v->startActivity(new Intent(this,CloudDiagnosticsActivity.class)));
+        findViewById(R.id.cloud_open_diagnostics).setOnClickListener(v->startActivity(new Intent(this,CloudDiagnosticsActivity.class).putExtra("mode",mode)));
         findViewById(R.id.cloud_logo).setOnClickListener(v->startActivity(new Intent(this,CloudInfoActivity.class)));
         state=findViewById(R.id.cloud_state);server=findViewById(R.id.cloud_server);
         pairingStatus=findViewById(R.id.cloud_pairing_status);statusMark=findViewById(R.id.cloud_status_mark);
@@ -107,6 +107,7 @@ public final class CloudActivity extends CloudScreen {
     @Override protected void onNewIntent(Intent i){super.onNewIntent(i);setIntent(i);handleIntent(i);}
     private void handleIntent(Intent i){
         if(i==null)return;
+        if(i.getBooleanExtra("open_diagnostics",false)){i.removeExtra("open_diagnostics");startActivity(new Intent(this,CloudDiagnosticsActivity.class));}
         if(i.getData()!=null){android.net.Uri uri=i.getData();i.setData(null);startActivityForResult(new Intent(this,CloudPairingActivity.class).setData(uri),PAIRING_REQUEST);}
     }
     @Override protected void onActivityResult(int request,int result,Intent data){

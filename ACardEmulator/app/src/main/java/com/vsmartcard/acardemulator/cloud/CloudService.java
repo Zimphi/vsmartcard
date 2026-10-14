@@ -22,6 +22,7 @@ public final class CloudService extends Service {
     final NfcStatus nfcStatus=new NfcStatus();
     final PhoneReader reader=new PhoneReader(nfcStatus);
     volatile String mode="card";
+    volatile boolean localTest;
     CloudApi api;
     private ScheduledExecutorService worker;
     private volatile long lastBeat;
@@ -40,8 +41,8 @@ public final class CloudService extends Service {
         if(i==null){stopSelf();return START_NOT_STICKY;}
         String requested=i.getStringExtra("mode");
         if(!"card".equals(requested)&&!"reader".equals(requested)){stopSelf();return START_NOT_STICKY;}
-        if(current==this&&worker!=null){if(!mode.equals(requested)){reader.detach();nfcStatus.reset();api.profile=null;worker.execute(api::end);}mode=requested;lastBeat=0;return START_NOT_STICKY;}
-        mode=requested;
+        if(current==this&&worker!=null){if(!mode.equals(requested)){reader.detach();nfcStatus.reset();api.profile=null;worker.execute(api::end);}mode=requested;nfcStatus.source("reader".equals(mode)?"phone-reader":"phone-card");lastBeat=0;return START_NOT_STICKY;}
+        mode=requested;nfcStatus.source("reader".equals(mode)?"phone-reader":"phone-card");
         CloudLog.add("CLOUD",R.string.cloud_log_connecting,false);
         try{
             JSONObject saved=new DeviceVault(this).load();if(saved==null)throw new IllegalStateException();
@@ -81,7 +82,7 @@ public final class CloudService extends Service {
                     &&!account.language.equals(preferences.getString("language","")))
                     preferences.edit().putString("language",account.language).apply();
             }
-            if("reader".equals(mode)){
+            if("reader".equals(mode)&&!localTest){
                 if(now-lastInventory>=5000||lastInventory==0){lastInventory=now;inventory();}
                 JSONObject packet=api.post("reader-poll",new JSONObject());
                 if(!packet.isNull("job")){

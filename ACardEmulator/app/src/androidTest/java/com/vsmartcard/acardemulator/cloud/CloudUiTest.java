@@ -183,6 +183,9 @@ public class CloudUiTest {
                 assertTrue(((TextView)help.findViewById(R.id.cloud_help_body)).getText().length()>30);
                 help.findViewById(R.id.cloud_help_back).performClick();
             });instrumentation.removeMonitor(monitor);
+            CloudPairingActivity pairing=(CloudPairingActivity)instrumentation.startActivitySync(new Intent(context,CloudPairingActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            instrumentation.waitForIdleSync();
+            instrumentation.runOnMainSync(()->{snapshot(pairing,"cloud-ui-pairing-en.png");pairing.finish();});
         }finally{
             if(activity!=null){final CloudActivity home=activity;instrumentation.runOnMainSync(home::finish);}
             if(original==null)preferences.edit().remove("language").commit();else preferences.edit().putString("language",original).commit();

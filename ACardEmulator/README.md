@@ -1,6 +1,6 @@
 # Android Smart Card Emulator
 
-## Phoenix Cloud · 4.5-phoenix
+## Phoenix Cloud · 4.6-phoenix
 
 The Phoenix screen displays the centered Phoenix logo and the currently paired
 simulator. A green check marks a fresh, successful cloud contact; a red cross
@@ -17,6 +17,32 @@ status, paired simulator and an HTTPS link to epassport-simulator.de.
 Connection freshness has a JVM regression test. Device tests verify both screen
 states; the connected Android phone also passed real connect, disconnect and
 reconnect checks without enrolling again.
+
+## 4.6 · 2026-10-15
+
+Diagnostics, developer settings and the colored live log now have their own
+screen. The information page shows the paired account. German/English can be
+chosen on the home page and synchronize with the paired user's cloud preference.
+The question-mark button opens contextual setup steps with actual localized app
+screenshots. The existing GPL notices and full offline license remain available.
+
+NFC diagnostics show device capabilities, optional Android 14+ manufacturer
+antenna coordinates, separate APDU latency/reliability graphs and a guided nine
+position comparison. Android does not expose RF strength/RSSI: the graph measures
+response times and failures; cloud latency includes network and simulator work.
+No recommendation is given without at least five samples per position.
+
+Reader tests use SELECT/READ only on synthetic ISO-DEP test cards. The laboratory
+Mac companion consumes explicitly started private ADB test requests and runs the
+existing local USB profile test or cloud PACE/EAC test. A baseline alignment run
+is clearly distinguished from full protocol verification. Start/Stop, prerequisites
+and data handling are explained before testing. See the companion setup in
+[Phoenix-NFC-Device-Tests](https://github.com/Zimphi/Phoenix-NFC-Device-Tests).
+
+A successful full test enables an explicit confirmation dialog before saving
+model/OS/app-version/mode evidence to the owner-bound compatibility list. Nothing
+is submitted automatically; baseline alignment does not qualify. No serial,
+IMEI, key, pairing token or APDU payload is included in this report.
 
 ## 4.5 · 2026-10-14
 
