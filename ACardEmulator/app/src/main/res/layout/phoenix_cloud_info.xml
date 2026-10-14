@@ -4,6 +4,7 @@
         <ImageView android:layout_width="96dp" android:layout_height="96dp" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:src="@drawable/phoenix_cloud_logo" android:contentDescription="@string/cloud_logo_description" android:scaleType="fitCenter"/>
         <TextView style="@style/CloudHeading" android:layout_marginTop="8dp" android:gravity="center" android:text="@string/cloud_about" android:textSize="24sp"/>
         <TextView android:id="@+id/cloud_info_version" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:layout_marginBottom="24dp" android:gravity="center" android:textColor="@color/cloud_muted" android:textSize="16sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp" android:text="@string/cloud_about_description" android:textSize="15sp" android:textColor="@color/cloud_muted"/>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:background="@drawable/cloud_panel">
             <TextView style="@style/CloudHeading" android:text="@string/cloud_connection_title"/>
             <TextView android:id="@+id/cloud_info_server" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="15sp" android:textColor="@color/cloud_muted"/>
@@ -11,6 +12,11 @@
             <TextView android:id="@+id/cloud_info_detail" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/cloud_muted"/>
         </LinearLayout>
         <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_website_title"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/cloud_website_description" android:textSize="15sp" android:textColor="@color/cloud_muted"/>
         <Button android:id="@+id/cloud_website" style="@style/CloudSecondaryButton" android:layout_marginTop="8dp" android:text="@string/cloud_website_address"/>
+        <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_license_title"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/cloud_license_notice" android:textSize="15sp" android:textColor="@color/cloud_muted"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/cloud_source_links" android:autoLink="web" android:textSize="15sp" android:textColor="@color/cloud_muted" android:textColorLink="@color/cloud_blue"/>
+        <Button android:id="@+id/cloud_license" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_show_license"/>
     </LinearLayout>
 </ScrollView>

@@ -1,6 +1,6 @@
 # Android Smart Card Emulator
 
-## Phoenix Cloud · 4.3-phoenix
+## Phoenix Cloud · 4.3.1-phoenix
 
 The Phoenix screen displays the centered Phoenix logo and the currently paired
 simulator. A green check marks a fresh, successful cloud contact; a red cross
@@ -17,6 +17,15 @@ status, paired simulator and an HTTPS link to epassport-simulator.de.
 Connection freshness has a JVM regression test. Device tests verify both screen
 states; the connected Android phone also passed real connect, disconnect and
 reconnect checks without enrolling again.
+
+## 4.3.1 · 2026-10-14
+
+The information page now explains Phoenix and browser simulation, identifies
+this independently developed fork and links to both source repositories.
+ACardEmulator remains GPL-3.0-or-later, as stated in the upstream source headers.
+The original, unmodified [GPL text](COPYING) is bundled in the APK and can be
+read offline from the information page. Existing copyright notices and
+third-party licenses remain in place.
 
 ## Upstream emulator
 

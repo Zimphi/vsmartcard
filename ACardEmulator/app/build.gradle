@@ -7,8 +7,8 @@ android {
         minSdk 23
         //noinspection ExpiredTargetSdkVersion
         targetSdk 34
-        versionCode 12
-        versionName "4.3-phoenix"
+        versionCode 13
+        versionName "4.3.1-phoenix"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         base.archivesName = "ACardEmulator-$versionName"
     }

@@ -87,6 +87,16 @@ public class CloudUiTest {
             info.findViewById(R.id.cloud_website).performClick();
             assertEquals("Website button did not open the expected URL",1,browser.getHits());
             instrumentation.removeMonitor(browser);
+            assertTrue(info.getString(R.string.cloud_license_notice).contains("GPL-3.0-or-later"));
+            android.app.AlertDialog license=info.showLicense();
+            assertTrue(license.isShowing());
+            ViewGroup licensePanel=(ViewGroup)license.findViewById(android.R.id.custom);
+            android.widget.ScrollView licenseScroll=(android.widget.ScrollView)licensePanel.getChildAt(0);
+            String licenseText=((TextView)licenseScroll.getChildAt(0)).getText().toString();
+            assertTrue(licenseText.contains("GNU GENERAL PUBLIC LICENSE"));
+            assertTrue(licenseText.contains("Version 3, 29 June 2007"));
+            assertTrue(licenseText.contains("END OF TERMS AND CONDITIONS"));
+            license.dismiss();
             snapshot(info,"cloud-ui-info.png");
             info.findViewById(R.id.cloud_info_back).performClick();
         });

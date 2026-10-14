@@ -1,6 +1,9 @@
 package com.vsmartcard.acardemulator.cloud;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.widget.ScrollView;
+import java.util.Scanner;
 import android.content.Intent;
 import android.content.ActivityNotFoundException;
 import android.net.Uri;
@@ -23,11 +26,26 @@ public final class CloudInfoActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.phoenix_cloud_info);
         ((TextView)findViewById(R.id.cloud_info_version)).setText(getString(R.string.cloud_version,BuildConfig.VERSION_NAME));
+        findViewById(R.id.cloud_license).setOnClickListener(v->showLicense());
         findViewById(R.id.cloud_info_back).setOnClickListener(v->finish());
         findViewById(R.id.cloud_website).setOnClickListener(v->{
             try{startActivity(websiteIntent());}
             catch(ActivityNotFoundException error){Toast.makeText(this,R.string.cloud_no_browser,Toast.LENGTH_LONG).show();}
         });
+    }
+    AlertDialog showLicense(){
+        TextView text=new TextView(this);
+        try(Scanner license=new Scanner(getResources().openRawResource(R.raw.gpl_3),"UTF-8")){
+            text.setText(license.useDelimiter("\\A").next());
+        }
+        text.setTextSize(14);text.setTextIsSelectable(true);
+        int padding=(int)(16*getResources().getDisplayMetrics().density);
+        text.setPadding(padding,padding,padding,padding);
+        ScrollView scroll=new ScrollView(this);scroll.addView(text);
+        AlertDialog dialog=new AlertDialog.Builder(this).setTitle(R.string.cloud_license_title)
+            .setView(scroll).setPositiveButton(android.R.string.ok,null).create();
+        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        dialog.show();return dialog;
     }
     static Intent websiteIntent(){return new Intent(Intent.ACTION_VIEW,Uri.parse("https://epassport-simulator.de"));}
     private void refreshConnection(){
