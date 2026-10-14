@@ -18,7 +18,7 @@ public final class CloudHceService extends HostApduService {
         CloudService service=CloudService.current;
         if(failed||service==null||!"card".equals(service.mode))return new byte[]{0x69,(byte)0x85};
         int current=generation;
-        long token=service.nfcStatus.started();
+        NfcStatus.Transfer token=service.nfcStatus.started();
         try{worker.execute(()->{
             if(current!=generation)return;
             byte[] response;
