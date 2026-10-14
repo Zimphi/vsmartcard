@@ -30,7 +30,7 @@ NFC diagnostics show device capabilities, optional Android 14+ manufacturer
 antenna coordinates, separate APDU latency/reliability graphs and a guided nine
 position comparison. Android does not expose RF strength/RSSI: the graph measures
 response times and failures; cloud latency includes network and simulator work.
-No recommendation is given without at least five samples per position.
+No recommendation is given without at least five observations per position (APDUs or measured failed NFC activations). Latency statistics use successful APDUs only.
 
 Reader tests use SELECT/READ only on synthetic ISO-DEP test cards. The laboratory
 Mac companion consumes explicitly started private ADB test requests and runs the

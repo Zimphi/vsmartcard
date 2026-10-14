@@ -145,11 +145,11 @@
     <string name="cloud_log_card_detected">ISO-DEP-Karte erkannt</string>
     <string name="cloud_tag_profile">PROFIL</string>
     <string name="cloud_quality_title">Verbindungsqualität</string>
-    <string name="cloud_quality_explanation">Keine RF-Feldstärke/RSSI. Gemessen werden erfolgreiche APDU-Übertragungen und Antwortzeiten. Cloud-Laufzeiten enthalten Internet und Simulator. Grün = Antwort, Rot = Abbruch.</string>
+    <string name="cloud_quality_explanation">Keine RF-Feldstärke/RSSI. Gemessen werden APDU-Antworten und fehlgeschlagene NFC-Verbindungsversuche. Median/p95/Maximum beziehen sich nur auf erfolgreiche APDU-Antworten. Cloud-Laufzeiten enthalten Internet und Simulator. Grün = Antwort, Rot = Fehler.</string>
     <string name="cloud_quality_none">Noch keine Messdaten. Starte einen Test oder eine NFC-Kommunikation.</string>
-    <string name="cloud_quality_pending">%1$d Übertragungen · mindestens 5 für eine Bewertung</string>
-    <string name="cloud_quality_summary">%1$d%% Antworten · %2$d/%3$d erfolgreich · %4$d Abbrüche\nMedian %5$.1f ms · p95 %6$.1f ms · Maximum %7$.1f ms</string>
-    <string name="cloud_quality_failed">%1$d Übertragungen · keine erfolgreiche Antwort</string>
+    <string name="cloud_quality_pending">%1$d Messereignisse · mindestens 5 für eine Bewertung</string>
+    <string name="cloud_quality_summary">%1$d%% Antworten · %2$d/%3$d erfolgreich · %4$d Fehler\nMedian %5$.1f ms · p95 %6$.1f ms · Maximum %7$.1f ms</string>
+    <string name="cloud_quality_failed">%1$d Messereignisse · keine erfolgreiche Antwort</string>
     <string name="cloud_quality_phone_card">Messstelle: Telefon/HCE · Ende-zu-Ende inklusive Cloud</string>
     <string name="cloud_quality_phone_reader">Messstelle: Telefon → ISO-DEP-Testkarte</string>
     <string name="cloud_quality_mac">Messstelle: Mac → PC/SC-Leser → Telefon</string>
@@ -168,11 +168,11 @@
     <string name="cloud_test_wrong_mode">Wechsle auf der Startseite zu „Karte lesen“.</string>
     <string name="cloud_test_nfc_required">NFC einschalten und die App entsperrt lassen.</string>
     <string name="cloud_position_title">Geführte Positionssuche</string>
-    <string name="cloud_position_explanation">Bewege das Telefon mit Display nach oben über dem festen Leser/der Testkarte in Schritten von etwa 5 mm. Pfeile leiten durch ein 3×3-Raster; sie messen keine Funkrichtung. Jede Position wird 30 Sekunden mit mindestens 5 APDUs verglichen. Ohne laufenden Test gibt es keine Bewertung.</string>
+    <string name="cloud_position_explanation">Bewege das Telefon mit Display nach oben über dem festen Leser/der Testkarte in Schritten von etwa 5 mm. Pfeile leiten durch ein 3×3-Raster; sie messen keine Funkrichtung. Jede Position wird 30 Sekunden mit mindestens 5 Messereignissen verglichen. Ohne laufenden Test gibt es keine Bewertung.</string>
     <string name="cloud_position_measure">Position messen · 30 s</string>
     <string name="cloud_position_reset">Positionssuche neu beginnen</string>
     <string name="cloud_position_step">Position %1$d/9 · %2$s · %3$s</string>
-    <string name="cloud_position_measuring">Ruhig halten · noch %1$d s · %2$d APDUs</string>
+    <string name="cloud_position_measuring">Ruhig halten · noch %1$d s · %2$d Messereignisse</string>
     <string name="cloud_position_insufficient">Zu wenig Daten. Test starten/fortsetzen und dieselbe Position erneut messen.</string>
     <string name="cloud_position_best">Beste gemessene Position: %1$d · %2$s\nPfeil zeigt den Weg von der letzten Rasterposition dorthin. Keine Aussage über ungemessene Positionen.</string>
     <string name="cloud_position_no_best">Keine Position mit erfolgreicher Antwort. Anderen Bereich suchen und wiederholen.</string>
@@ -184,7 +184,7 @@
     <string name="cloud_compatibility_failed">Meldung nicht gespeichert. Cloud-Verbindung und Testergebnis prüfen.</string>
     <string name="cloud_compatibility_no_result">Zuerst einen vollständigen erfolgreichen Test durchführen.</string>
     <string name="cloud_lab_title">Labortest auf dem Mac</string>
-    <string name="cloud_lab_disclosure">Der autorisierte Mac-Begleiter führt den gewählten Test am angeschlossenen REINER-SCT-Leser aus. USB-Debugging und der Phoenix-Labor-Debug-Build sind erforderlich. Beim lokalen USB-Test wird vorübergehend die separate vsmartcard-Test-App geöffnet und konfiguriert. Es werden nur synthetische Profile benutzt. Ergebnisse und APDU-Metadaten bleiben zunächst lokal. Keine automatische Kompatibilitätsmeldung. Der Basistest legt das gewählte synthetische Cloud-Profil auf und läuft bis zu etwa zehn Minuten; er kann jederzeit gestoppt werden.</string>
+    <string name="cloud_lab_disclosure">Der autorisierte Mac-Begleiter führt den gewählten Test am angeschlossenen REINER-SCT-Leser aus. USB-Debugging und der Phoenix-Labor-Debug-Build sind erforderlich. Beim lokalen USB-Test wird vorübergehend die separate vsmartcard-Test-App geöffnet und konfiguriert. Es werden nur synthetische Profile benutzt. Ergebnisse und APDU-Metadaten bleiben zunächst lokal. Keine automatische Kompatibilitätsmeldung. Der Basistest legt das gewählte synthetische Cloud-Profil auf und wiederholt bis zu 120 Messzyklen. Nach neun gemessenen Positionen stoppt die Positionssuche ihn automatisch; du kannst ihn jederzeit früher stoppen.</string>
     <string name="cloud_lab_choices">Lokaler USB-Profiltest|Cloud PACE/EAC|NFC-Basistest zur Ausrichtung</string>
     <string name="cloud_lab_waiting">Warte auf Mac-Begleiter · USB/ADB und lab_phone_companion.py prüfen</string>
     <string name="cloud_lab_running">Mac-Test läuft · %1$d/%2$d Versuche abgeschlossen</string>
@@ -201,4 +201,6 @@
     <string name="cloud_antenna_title">Vom Hersteller gemeldete Antennenposition</string>
     <string name="cloud_antenna_unavailable">Dieses Gerät liefert keine Antennenkoordinaten. Nutze die geführte Positionssuche. RF-Pegel/RSSI ist nicht verfügbar.</string>
     <string name="cloud_antenna_explanation">Ansicht von der Displayseite, oben links = Ursprung. Maße und Positionen stammen aus der Geräte-Firmware, nicht aus einer Feldstärkemessung.</string>
+    <string name="cloud_lab_connect_failures">Verbindungsaufbau fehlgeschlagen: %1$d</string>
+    <string name="cloud_lab_card_required">Wähle auf der Startseite „Karte simulieren“ und verbinde Phoenix Cloud, bevor du den Cloud- oder Ausrichtungstest startest.</string>
 </resources>

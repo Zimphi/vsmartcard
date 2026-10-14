@@ -76,8 +76,8 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         ((TextView)findViewById(R.id.cloud_device_values)).setText(values);
         PhoneReader.Capabilities caps=testReader.capabilities;
         ((TextView)findViewById(R.id.cloud_reader_capabilities)).setText(caps==null?"":getString(R.string.cloud_reader_capabilities,caps.technologies,caps.maxBytes,caps.timeoutMs,getString(caps.extended?R.string.cloud_yes:R.string.cloud_no)));
-        findViewById(R.id.cloud_test_reader).setEnabled(!testing&&!labActive);
-        findViewById(R.id.cloud_test_mac).setEnabled(!testing&&!labActive);
+        findViewById(R.id.cloud_test_reader).setEnabled(!testing&&!labActive&&readerThread==null);
+        findViewById(R.id.cloud_test_mac).setEnabled(!testing&&!labActive&&readerThread==null);
         findViewById(R.id.cloud_test_stop).setEnabled(testing||labActive);
         findViewById(R.id.cloud_compatibility).setEnabled(successfulReport!=null&&!testing&&!labActive);
     }
@@ -102,6 +102,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
             measuringUntil=0;
             if(!guide.record(samples)){positionNotice=true;findViewById(R.id.cloud_position_measure).setEnabled(true);status.setText(R.string.cloud_position_insufficient);if(positionReader)stopReaderTest();return;}
             if(positionReader)stopReaderTest();
+            if(guide.index()==9&&labActive&&"baseline".equals(labMode))try{lab.cancel();}catch(Exception failure){message(R.string.cloud_lab_error);}
         }
         if(positionNotice)return;
         arrow.setText(guide.nextDirection());
@@ -124,7 +125,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
     }
     private void message(int resource){((TextView)findViewById(R.id.cloud_test_status)).setText(resource);}
     private void confirmReaderTest(boolean position){
-        if(testing||labActive)return;
+        if(testing||labActive||readerThread!=null)return;
         CloudService service=CloudService.current;
         if(service!=null&&!"reader".equals(service.mode)){message(R.string.cloud_test_wrong_mode);return;}
         android.nfc.NfcAdapter nfc=android.nfc.NfcAdapter.getDefaultAdapter(this);
@@ -173,7 +174,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         if(readerThread!=null)readerThread.interrupt();testReader.cancel();if(running)message(R.string.cloud_test_stopped);
     }
     private void confirmMacTest(){
-        if(testing||labActive)return;
+        if(testing||labActive||readerThread!=null)return;
         if(!ACardEmulator.BuildConfig.DEBUG){message(R.string.cloud_lab_debug_required);return;}
         final String[] modes={"usb-profile","cloud-eac","baseline"};
         new android.app.AlertDialog.Builder(this).setTitle(R.string.cloud_lab_title)
@@ -181,6 +182,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
     }
     android.app.AlertDialog confirmMacMode(String mode){
         if(!java.util.Arrays.asList("usb-profile","cloud-eac","baseline").contains(mode))throw new IllegalArgumentException();
+        if(!"usb-profile".equals(mode)&&(CloudService.current==null||!"card".equals(CloudService.current.mode)||!CloudService.connected())){message(R.string.cloud_lab_card_required);return null;}
         return new android.app.AlertDialog.Builder(this).setTitle(R.string.cloud_lab_title).setMessage(R.string.cloud_lab_disclosure)
             .setNegativeButton(android.R.string.cancel,null).setPositiveButton(R.string.cloud_test_start,(dialog,which)->{
                 try{useLab=true;labMode=mode;NfcQuality.clear("mac-pcsc");lab.request(labMode,kind(),"baseline".equals(mode)?120:1);labActive=true;sourceOverride="mac-pcsc";successfulReport=null;message(R.string.cloud_lab_waiting);}
@@ -197,7 +199,11 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
             else if("complete".equals(phase)){
                 successfulReport=LabControl.successfulReport(progress);
                 if(progress.optBoolean("passed"))((TextView)findViewById(R.id.cloud_test_status)).setText(getString(R.string.cloud_lab_pass,labMode));else message(R.string.cloud_lab_failed);
-            }else if("aborted".equals(phase)||"failed".equals(phase))message(R.string.cloud_lab_failed);
+            }else if("aborted".equals(phase))message(R.string.cloud_test_stopped);
+            else if("failed".equals(phase))message(R.string.cloud_lab_failed);
+            int connectionFailures=progress.optInt("connect_failures");
+            if(connectionFailures>0&&java.util.Arrays.asList("queued","running","complete","aborted","failed").contains(phase))
+                ((TextView)findViewById(R.id.cloud_test_status)).append("\n"+getString(R.string.cloud_lab_connect_failures,connectionFailures));
         }catch(Exception invalid){message(R.string.cloud_lab_error);}
     }
     private void confirmCompatibility(){

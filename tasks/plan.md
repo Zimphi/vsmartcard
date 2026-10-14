@@ -35,8 +35,8 @@ before each submission is mandatory. Existing unrelated dirty files are preserve
   prerequisite is shown. Cloud pairing stays separate from local upstream test app.
 - Quality is successful APDUs/attempts + latency distribution + interruption count;
   RF strength/RSSI is unavailable. A guided 3x3 position grid uses user-confirmed
-  equal-duration samples. Arrows guide planned movement or return to best *measured*
-  position, never claim a sensed magnetic direction. Too few samples => inconclusive.
+  equal-duration samples (APDU responses/failures or measured failed NFC activations). Arrows guide planned movement or return to best *measured*
+  position, never claim a sensed magnetic direction. At least five observations are required; latency statistics use only successful APDUs. Too few samples => inconclusive.
 - English/German via Android resources and per-app locale; preference saved locally
   offline, synchronized to paired account when authenticated. Strings with protocol
   identifiers remain unchanged. Main screen has question-mark help and subtle
