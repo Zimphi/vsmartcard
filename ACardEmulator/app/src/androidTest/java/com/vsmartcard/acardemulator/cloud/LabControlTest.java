@@ -69,6 +69,27 @@ public class LabControlTest {
             assertTrue(uploaded.await(5,java.util.concurrent.TimeUnit.SECONDS));assertEquals(1,calls.get());assertTrue(received[0].getBoolean("consent"));
         }finally{instrumentation.runOnMainSync(activity::finish);}
     }
+    @Test public void unchangedLabResultsDoNotOverwriteNewUserGuidance() throws Exception {
+        android.app.Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();Context context=instrumentation.getTargetContext();
+        File folder=new File(context.getCacheDir(),"isolated-lab-guidance");assertTrue(folder.isDirectory()||folder.mkdir());
+        LabControl control=new LabControl(new ContextWrapper(context){@Override public File getCacheDir(){return folder;}});
+        String id=control.request("usb-profile","eid",1);
+        JSONObject progress=new JSONObject().put("format","phoenix-lab-progress-v1").put("id",id).put("phase","failed").put("passed",false).put("failure_code","no_nfc_target");
+        write(folder,"lab-progress.json",progress);
+        CloudDiagnosticsActivity activity=(CloudDiagnosticsActivity)instrumentation.startActivitySync(new android.content.Intent(context,CloudDiagnosticsActivity.class).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+        try{
+            java.lang.reflect.Field field=CloudDiagnosticsActivity.class.getDeclaredField("lab");field.setAccessible(true);field.set(activity,control);
+            java.lang.reflect.Method refresh=CloudDiagnosticsActivity.class.getDeclaredMethod("readLabProgress");refresh.setAccessible(true);
+            instrumentation.runOnMainSync(()->{
+                try{
+                    refresh.invoke(activity);android.widget.TextView status=activity.findViewById(ACardEmulator.R.id.cloud_test_status);
+                    assertEquals(activity.getString(ACardEmulator.R.string.cloud_lab_no_target),status.getText().toString());
+                    status.setText(ACardEmulator.R.string.cloud_lab_card_required);refresh.invoke(activity);
+                    assertEquals(activity.getString(ACardEmulator.R.string.cloud_lab_card_required),status.getText().toString());
+                }catch(Exception failure){throw new AssertionError(failure);}
+            });
+        }finally{instrumentation.runOnMainSync(activity::finish);for(File file:folder.listFiles())assertTrue(file.delete());assertTrue(folder.delete());}
+    }
     private static JSONObject read(File folder,String name) throws Exception {
         try(java.io.FileInputStream in=new java.io.FileInputStream(new File(folder,name))){
             byte[] bytes=new byte[(int)new File(folder,name).length()];assertEquals(bytes.length,in.read(bytes));return new JSONObject(new String(bytes,"UTF-8"));

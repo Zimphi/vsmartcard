@@ -15,7 +15,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
     private boolean positionNotice;
     private PositionGuide guide=new PositionGuide();
     private long measuringFrom;
-    private String measuringSource,sourceOverride,labMode;
+    private String measuringSource,sourceOverride,labMode,renderedLabProgress;
     private LabControl lab;private boolean labActive;
     private org.json.JSONObject successfulReport;
     private final Handler handler=new Handler();
@@ -200,6 +200,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         if(!useLab)return;
         try{
             org.json.JSONObject progress=lab.progress();if(progress==null)return;
+            String signature=progress.toString();if(signature.equals(renderedLabProgress))return;renderedLabProgress=signature;
             String phase=progress.optString("phase");labMode=progress.getJSONObject("request").getString("mode");
             labActive="running".equals(phase)||"queued".equals(phase);sourceOverride="mac-pcsc";
             if(labActive)((TextView)findViewById(R.id.cloud_test_status)).setText(getString(R.string.cloud_lab_running,progress.optInt("completed"),progress.getJSONObject("request").getInt("attempts")));
