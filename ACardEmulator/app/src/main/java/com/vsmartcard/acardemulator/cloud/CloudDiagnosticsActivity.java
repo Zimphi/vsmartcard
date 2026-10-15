@@ -30,11 +30,17 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         lab=new LabControl(this);localNfc.source("phone-reader");
         android.widget.Spinner kind=findViewById(R.id.cloud_test_kind);
         kind.setAdapter(new android.widget.ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,new String[]{"eID","ePassport"}));
+        kind.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){
+            public void onNothingSelected(android.widget.AdapterView<?> parent){}
+            public void onItemSelected(android.widget.AdapterView<?> parent,android.view.View view,int position,long id){
+                if(!testing&&!labActive){measuringUntil=0;positionNotice=false;guide=new PositionGuide();renderPosition();}
+            }
+        });
         findViewById(R.id.cloud_test_reader).setOnClickListener(v->confirmReaderTest(false));
         findViewById(R.id.cloud_test_mac).setOnClickListener(v->confirmMacTest());
         findViewById(R.id.cloud_test_stop).setOnClickListener(v->{stopReaderTest();try{lab.cancel();}catch(Exception ignored){}labActive=false;useLab=false;measuringUntil=0;message(R.string.cloud_test_stopped);});
         findViewById(R.id.cloud_position_measure).setOnClickListener(v->measurePosition());
-        findViewById(R.id.cloud_position_reset).setOnClickListener(v->{measuringUntil=0;positionNotice=false;guide=new PositionGuide();renderPosition();});
+        findViewById(R.id.cloud_position_reset).setOnClickListener(v->{if(positionReader)stopReaderTest();measuringUntil=0;positionNotice=false;guide=new PositionGuide();renderPosition();});
         findViewById(R.id.cloud_compatibility).setOnClickListener(v->confirmCompatibility());
         findViewById(R.id.cloud_diagnostics_back).setOnClickListener(v->finish());
         android.widget.CheckBox developer=findViewById(R.id.cloud_developer_options);
@@ -76,6 +82,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         ((TextView)findViewById(R.id.cloud_device_values)).setText(values);
         PhoneReader.Capabilities caps=testReader.capabilities;
         ((TextView)findViewById(R.id.cloud_reader_capabilities)).setText(caps==null?"":getString(R.string.cloud_reader_capabilities,caps.technologies,caps.maxBytes,caps.timeoutMs,getString(caps.extended?R.string.cloud_yes:R.string.cloud_no)));
+        findViewById(R.id.cloud_test_kind).setEnabled(!testing&&!labActive&&readerThread==null&&measuringUntil==0);
         findViewById(R.id.cloud_test_reader).setEnabled(!testing&&!labActive&&readerThread==null);
         findViewById(R.id.cloud_test_mac).setEnabled(!testing&&!labActive&&readerThread==null);
         findViewById(R.id.cloud_test_stop).setEnabled(testing||labActive);
@@ -108,7 +115,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         arrow.setText(guide.nextDirection());
         if(guide.index()<9)status.setText(getString(R.string.cloud_position_step,guide.index()+1,names[guide.index()],guide.nextDirection()));
         else status.setText(guide.best()<0?getString(R.string.cloud_position_no_best):getString(R.string.cloud_position_best,guide.best()+1,names[guide.best()]));
-        findViewById(R.id.cloud_position_measure).setEnabled(guide.index()<9&&measuringUntil==0);
+        findViewById(R.id.cloud_position_measure).setEnabled(guide.index()<9&&measuringUntil==0&&readerThread==null&&!testing&&(!labActive||"baseline".equals(labMode)));
     }
     private void beginPosition(){
         if(guide.index()>=9||measuringUntil>0)return;
@@ -185,7 +192,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         if(!"usb-profile".equals(mode)&&(CloudService.current==null||!"card".equals(CloudService.current.mode)||!CloudService.connected())){message(R.string.cloud_lab_card_required);return null;}
         return new android.app.AlertDialog.Builder(this).setTitle(R.string.cloud_lab_title).setMessage(R.string.cloud_lab_disclosure)
             .setNegativeButton(android.R.string.cancel,null).setPositiveButton(R.string.cloud_test_start,(dialog,which)->{
-                try{useLab=true;labMode=mode;NfcQuality.clear("mac-pcsc");lab.request(labMode,kind(),"baseline".equals(mode)?120:1);labActive=true;sourceOverride="mac-pcsc";successfulReport=null;message(R.string.cloud_lab_waiting);}
+                try{useLab=true;labMode=mode;if("baseline".equals(mode)){guide=new PositionGuide();positionNotice=false;}NfcQuality.clear("mac-pcsc");lab.request(labMode,kind(),"baseline".equals(mode)?120:1);labActive=true;sourceOverride="mac-pcsc";successfulReport=null;message(R.string.cloud_lab_waiting);}
                 catch(Exception failure){message(R.string.cloud_lab_error);}
             }).show();
     }
@@ -201,6 +208,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
                 if(progress.optBoolean("passed"))((TextView)findViewById(R.id.cloud_test_status)).setText(getString(R.string.cloud_lab_pass,labMode));else message(R.string.cloud_lab_failed);
             }else if("aborted".equals(phase))message(R.string.cloud_test_stopped);
             else if("failed".equals(phase))message(R.string.cloud_lab_failed);
+            if(!labActive&&!progress.optBoolean("passed")&&"no_nfc_target".equals(progress.optString("failure_code")))message(R.string.cloud_lab_no_target);
             int connectionFailures=progress.optInt("connect_failures");
             if(connectionFailures>0&&java.util.Arrays.asList("queued","running","complete","aborted","failed").contains(phase))
                 ((TextView)findViewById(R.id.cloud_test_status)).append("\n"+getString(R.string.cloud_lab_connect_failures,connectionFailures));

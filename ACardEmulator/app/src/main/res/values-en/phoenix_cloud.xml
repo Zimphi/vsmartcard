@@ -145,13 +145,13 @@
     <string name="cloud_position_no_best">No position produced a successful response. Try another area and repeat.</string>
     <string name="cloud_position_names">Center|Left|Upper left|Up|Upper right|Right|Lower right|Down|Lower left</string>
     <string name="cloud_compatibility">Confirm result for compatibility list</string>
-    <string name="cloud_compatibility_disclosure">You confirm a successful test and send the following to your paired Phoenix account: manufacturer, model, Android/API version, app version, tested mode and number of successful attempts. No serial number, IMEI, PIN, keys or card data. This is a user-confirmed observation, not official certification. Save now?</string>
+    <string name="cloud_compatibility_disclosure">You confirm a successful test and send the following to your paired Phoenix account: manufacturer, model, Android/API version, app version, tested mode and number of successful attempts. No serial number, IMEI, PIN, keys or card data. This is a user-confirmed observation, not official certification. Save now? Reader mode confirms an ISO-DEP SELECT/READ baseline, not PACE/EAC verification. Card simulation requires the complete recorded profile test to pass.</string>
     <string name="cloud_compatibility_save">Confirm and save</string>
     <string name="cloud_compatibility_saved">Compatibility report saved in your account.</string>
     <string name="cloud_compatibility_failed">Report not saved. Check cloud connection and test result.</string>
     <string name="cloud_compatibility_no_result">Complete a successful test first.</string>
     <string name="cloud_lab_title">Laboratory test on Mac</string>
-    <string name="cloud_lab_disclosure">The authorized Mac companion runs the selected test using the attached REINER SCT reader. USB debugging and the Phoenix laboratory debug build are required. The local USB test temporarily opens and configures the separate vsmartcard test app. Only synthetic profiles are used. Results and APDU metadata remain local initially. No compatibility report is submitted automatically. The baseline test mounts the selected synthetic cloud profile and repeats up to 120 measurement cycles. Position guidance stops it automatically after nine measured positions; stop it earlier at any time.</string>
+    <string name="cloud_lab_disclosure">The authorized Mac companion runs the selected test using the attached REINER SCT reader. USB debugging and the Phoenix laboratory debug build are required. The local USB test temporarily opens and configures the separate vsmartcard test app. Only synthetic profiles are used. Results and APDU metadata remain local initially. No compatibility report is submitted automatically. The baseline test mounts the selected synthetic cloud profile and repeats up to 120 measurement cycles. Position guidance stops it automatically after nine measured positions; stop it earlier at any time. The Mac companion must use the same synthetic Phoenix test account that this app is paired with.</string>
     <string name="cloud_lab_choices">Local USB profile test|Cloud PACE/EAC|NFC baseline for positioning</string>
     <string name="cloud_lab_waiting">Waiting for Mac companion · check USB/ADB and lab_phone_companion.py</string>
     <string name="cloud_lab_running">Mac test running · %1$d/%2$d attempts completed</string>
@@ -170,4 +170,5 @@
     <string name="cloud_antenna_explanation">Viewed from the screen side, with the origin at the upper left. Dimensions and positions come from device firmware, not a field-strength measurement.</string>
     <string name="cloud_lab_connect_failures">Failed connection attempts: %1$d</string>
     <string name="cloud_lab_card_required">Choose “Simulate card” on the home screen and connect Phoenix Cloud before starting the cloud or positioning test.</string>
+    <string name="cloud_lab_no_target">The Mac reader detects no NFC target. Unlock the phone and position its NFC antenna steadily over the reader. No profile has been verified over NFC yet.</string>
 </resources>

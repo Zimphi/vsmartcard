@@ -178,13 +178,13 @@
     <string name="cloud_position_no_best">Keine Position mit erfolgreicher Antwort. Anderen Bereich suchen und wiederholen.</string>
     <string name="cloud_position_names">Mitte|Links|Oben links|Oben|Oben rechts|Rechts|Unten rechts|Unten|Unten links</string>
     <string name="cloud_compatibility">Ergebnis für Kompatibilitätsliste bestätigen</string>
-    <string name="cloud_compatibility_disclosure">Du bestätigst einen erfolgreichen Test und überträgst an dein gekoppeltes Phoenix-Konto: Hersteller, Modell, Android-/API-Version, App-Version, getesteten Modus und Anzahl erfolgreicher Versuche. Keine Seriennummer, IMEI, PIN, Schlüssel oder Kartendaten. Die Meldung ist eine Nutzerbestätigung, keine offizielle Zertifizierung. Jetzt speichern?</string>
+    <string name="cloud_compatibility_disclosure">Du bestätigst einen erfolgreichen Test und überträgst an dein gekoppeltes Phoenix-Konto: Hersteller, Modell, Android-/API-Version, App-Version, getesteten Modus und Anzahl erfolgreicher Versuche. Keine Seriennummer, IMEI, PIN, Schlüssel oder Kartendaten. Die Meldung ist eine Nutzerbestätigung, keine offizielle Zertifizierung. Jetzt speichern? Im Lesemodus bestätigst du einen ISO-DEP-Basistest mit SELECT/READ, keine PACE-/EAC-Prüfung. Im Simulationsmodus muss der vollständige aufgezeichnete Profiltest bestehen.</string>
     <string name="cloud_compatibility_save">Ausdrücklich bestätigen und speichern</string>
     <string name="cloud_compatibility_saved">Kompatibilitätsmeldung in deinem Konto gespeichert.</string>
     <string name="cloud_compatibility_failed">Meldung nicht gespeichert. Cloud-Verbindung und Testergebnis prüfen.</string>
     <string name="cloud_compatibility_no_result">Zuerst einen vollständigen erfolgreichen Test durchführen.</string>
     <string name="cloud_lab_title">Labortest auf dem Mac</string>
-    <string name="cloud_lab_disclosure">Der autorisierte Mac-Begleiter führt den gewählten Test am angeschlossenen REINER-SCT-Leser aus. USB-Debugging und der Phoenix-Labor-Debug-Build sind erforderlich. Beim lokalen USB-Test wird vorübergehend die separate vsmartcard-Test-App geöffnet und konfiguriert. Es werden nur synthetische Profile benutzt. Ergebnisse und APDU-Metadaten bleiben zunächst lokal. Keine automatische Kompatibilitätsmeldung. Der Basistest legt das gewählte synthetische Cloud-Profil auf und wiederholt bis zu 120 Messzyklen. Nach neun gemessenen Positionen stoppt die Positionssuche ihn automatisch; du kannst ihn jederzeit früher stoppen.</string>
+    <string name="cloud_lab_disclosure">Der autorisierte Mac-Begleiter führt den gewählten Test am angeschlossenen REINER-SCT-Leser aus. USB-Debugging und der Phoenix-Labor-Debug-Build sind erforderlich. Beim lokalen USB-Test wird vorübergehend die separate vsmartcard-Test-App geöffnet und konfiguriert. Es werden nur synthetische Profile benutzt. Ergebnisse und APDU-Metadaten bleiben zunächst lokal. Keine automatische Kompatibilitätsmeldung. Der Basistest legt das gewählte synthetische Cloud-Profil auf und wiederholt bis zu 120 Messzyklen. Nach neun gemessenen Positionen stoppt die Positionssuche ihn automatisch; du kannst ihn jederzeit früher stoppen. Der Mac-Begleiter muss denselben synthetischen Phoenix-Testbenutzer verwenden, mit dem diese App gekoppelt ist.</string>
     <string name="cloud_lab_choices">Lokaler USB-Profiltest|Cloud PACE/EAC|NFC-Basistest zur Ausrichtung</string>
     <string name="cloud_lab_waiting">Warte auf Mac-Begleiter · USB/ADB und lab_phone_companion.py prüfen</string>
     <string name="cloud_lab_running">Mac-Test läuft · %1$d/%2$d Versuche abgeschlossen</string>
@@ -203,4 +203,5 @@
     <string name="cloud_antenna_explanation">Ansicht von der Displayseite, oben links = Ursprung. Maße und Positionen stammen aus der Geräte-Firmware, nicht aus einer Feldstärkemessung.</string>
     <string name="cloud_lab_connect_failures">Verbindungsaufbau fehlgeschlagen: %1$d</string>
     <string name="cloud_lab_card_required">Wähle auf der Startseite „Karte simulieren“ und verbinde Phoenix Cloud, bevor du den Cloud- oder Ausrichtungstest startest.</string>
+    <string name="cloud_lab_no_target">Der Mac-Leser erkennt kein NFC-Ziel. Entsperre das Telefon und positioniere seine NFC-Antenne stabil über der Lesefläche. Es wurde noch kein Profil über NFC geprüft.</string>
 </resources>
