@@ -28,6 +28,7 @@ class CloudApi {
         JSONObject value=packet.optJSONObject("account");
         if(value==null){account=null;return;}
         String name=value.optString("display_name","");String language=value.optString("language","");
+        if(name.matches("[a-z0-9._-]{1,64}@users\\.phoenix\\.invalid"))name=name.substring(0,name.indexOf('@'));
         account=name.isEmpty()||name.length()>320?null:new Account(name,"en".equals(language)||"de".equals(language)?language:null);
     }
     private void updateProfile(JSONObject packet){

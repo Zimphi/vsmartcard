@@ -64,6 +64,8 @@ public class CloudDeviceTest {
         api.statusPacket=new JSONObject().put("session_id",api.id).put("active",false)
             .put("account",new JSONObject().put("display_name","Test User").put("language","en"));
         api.heartbeat(new JSONObject());assertEquals("Test User",api.account.name);assertEquals("en",api.account.language);
+        api.statusPacket.getJSONObject("account").put("display_name","admin@users.phoenix.invalid");
+        api.heartbeat(new JSONObject());assertEquals("admin",api.account.name);
         api.statusPacket.getJSONObject("account").put("language","unknown");api.heartbeat(new JSONObject());assertNull(api.account.language);
         api.statusPacket.remove("account");api.heartbeat(new JSONObject());assertNull(api.account);
     }
