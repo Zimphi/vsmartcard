@@ -80,10 +80,16 @@ class CloudApi {
         }
         return result;
     }
-    synchronized void heartbeat(JSONObject body) throws Exception {
+    void heartbeat(JSONObject body) throws Exception {
+        final JSONObject capturedSession;final String capturedId;
+        synchronized(this){capturedSession=session;capturedId=openedId;}
         JSONObject current=post("status",body);
-        updateProfile(current);updateAccount(current);
-        if(openedId!=null&&!openedId.equals(current.getString("session_id"))){session=null;openedId=null;}
+        synchronized(this){
+            // APDU commits replace the session object; ignore a heartbeat from an older state.
+            if(session!=capturedSession||!java.util.Objects.equals(openedId,capturedId))return;
+            updateProfile(current);updateAccount(current);
+            if(openedId!=null&&!openedId.equals(current.getString("session_id"))){session=null;openedId=null;}
+        }
     }
     synchronized void begin() throws Exception {
         session=null;openedId=null;

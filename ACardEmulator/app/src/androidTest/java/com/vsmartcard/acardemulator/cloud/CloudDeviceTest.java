@@ -31,7 +31,7 @@ public class CloudDeviceTest {
             vault.clear();assertNull(vault.load());
         }finally{if(original!=null)vault.save(original.getString("server"),original.getString("token"));else vault.clear();}
     }
-    private static final class FakeApi extends CloudApi {
+    private static class FakeApi extends CloudApi {
         final List<String> calls=new ArrayList<>();
         long revision;
         boolean uncertain;
@@ -47,6 +47,43 @@ public class CloudDeviceTest {
             return new JSONObject().put("session",new JSONObject().put("id",id).put("revision",++revision).put("checkpoint","sealed"))
                 .put("apdu_response","9000");
         }
+    }
+    private static final class SlowHeartbeatApi extends FakeApi {
+        final java.util.concurrent.CountDownLatch entered=new java.util.concurrent.CountDownLatch(1);
+        final java.util.concurrent.CountDownLatch release=new java.util.concurrent.CountDownLatch(1);
+        @Override JSONObject post(String endpoint,JSONObject body)throws Exception{
+            if(!endpoint.equals("status"))return super.post(endpoint,body);
+            JSONObject captured=new JSONObject().put("session_id",id).put("active",true);
+            calls.add("status");entered.countDown();
+            if(!release.await(5,java.util.concurrent.TimeUnit.SECONDS))throw new java.io.IOException();
+            return captured;
+        }
+    }
+    @Test public void heartbeatNetworkWaitDoesNotBlockTheNextApdu()throws Exception{
+        SlowHeartbeatApi api=new SlowHeartbeatApi();api.apdu(new byte[]{0, (byte)0xa4,4,0});
+        java.util.concurrent.ExecutorService tasks=java.util.concurrent.Executors.newFixedThreadPool(2);
+        try{
+            java.util.concurrent.Future<?> beat=tasks.submit(()->{api.heartbeat(new JSONObject());return null;});
+            assertTrue(api.entered.await(2,java.util.concurrent.TimeUnit.SECONDS));
+            java.util.concurrent.Future<byte[]> command=tasks.submit(()->api.apdu(new byte[]{0,(byte)0xb0,0,0}));
+            assertArrayEquals(new byte[]{(byte)0x90,0},command.get(1,java.util.concurrent.TimeUnit.SECONDS));
+            api.release.countDown();beat.get(2,java.util.concurrent.TimeUnit.SECONDS);
+            assertEquals(1,java.util.Collections.frequency(api.calls,"open"));
+        }finally{api.release.countDown();tasks.shutdown();tasks.awaitTermination(3,java.util.concurrent.TimeUnit.SECONDS);}
+    }
+    @Test public void lateHeartbeatCannotClearOrOverwriteANewerCardSession()throws Exception{
+        SlowHeartbeatApi api=new SlowHeartbeatApi();api.apdu(new byte[]{0, (byte)0xa4,4,0});
+        java.util.concurrent.ExecutorService tasks=java.util.concurrent.Executors.newFixedThreadPool(2);
+        try{
+            java.util.concurrent.Future<?> beat=tasks.submit(()->{api.heartbeat(new JSONObject());return null;});
+            assertTrue(api.entered.await(2,java.util.concurrent.TimeUnit.SECONDS));
+            api.id="22345678-1234-4234-8234-123456789abc";
+            tasks.submit(()->{api.begin();return null;}).get(1,java.util.concurrent.TimeUnit.SECONDS);
+            api.release.countDown();beat.get(2,java.util.concurrent.TimeUnit.SECONDS);
+            api.apdu(new byte[]{0,(byte)0xb0,0,0});
+            assertEquals(2,java.util.Collections.frequency(api.calls,"open"));
+            assertFalse(api.profile.active);
+        }finally{api.release.countDown();tasks.shutdown();tasks.awaitTermination(3,java.util.concurrent.TimeUnit.SECONDS);}
     }
     @Test public void profileMetadataIsOptionalAndClearedWhenServerRemovesSelection()throws Exception{
         FakeApi api=new FakeApi();api.heartbeat(new JSONObject());

@@ -1,6 +1,6 @@
 # Android Smart Card Emulator
 
-## Phoenix Cloud · 4.6-phoenix
+## Phoenix Cloud · 4.7-phoenix
 
 The Phoenix screen displays the centered Phoenix logo and the currently paired
 simulator. A green check marks a fresh, successful cloud contact; a red cross
@@ -17,6 +17,18 @@ status, paired simulator and an HTTPS link to epassport-simulator.de.
 Connection freshness has a JVM regression test. Device tests verify both screen
 states; the connected Android phone also passed real connect, disconnect and
 reconnect checks without enrolling again.
+
+## 4.7 · 2026-10-15
+
+Heartbeat HTTP requests no longer hold the card-session monitor while waiting
+for the network. APDUs remain strictly ordered, with unchanged revision checks
+and no retry of uncertain commands. A heartbeat response is applied only if the
+captured session object and opened ID are still current; an older status response
+cannot reset or overwrite a newer card session. Two device regression tests
+reproduce the former blocking and verify the concurrency safeguards.
+
+This removes a measured avoidable dispatch delay. Physical NFC stability still
+requires a separate soak test; it does not prove that all RF/reader drops are fixed.
 
 ## 4.6 · 2026-10-15
 
