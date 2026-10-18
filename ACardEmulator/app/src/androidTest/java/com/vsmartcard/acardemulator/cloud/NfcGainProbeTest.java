@@ -12,6 +12,37 @@ import static org.junit.Assert.*;
 
 /** Physical observation, no synthetic samples and no claim of support from API level alone. */
 public class NfcGainProbeTest {
+    @Test @SdkSuppress(minSdkVersion=35) public void attemptObserveModeActivation() throws Exception {
+        android.app.Instrumentation i=InstrumentationRegistry.getInstrumentation();
+        android.content.Context context=i.getTargetContext();NfcAdapter nfc=NfcAdapter.getDefaultAdapter(context);
+        assertNotNull(nfc);assertTrue(nfc.isEnabled());final boolean original=nfc.isObserveModeEnabled();
+        JSONObject report=new JSONObject().put("format","phoenix-observe-activation-v1")
+            .put("model",android.os.Build.MODEL).put("android_api",android.os.Build.VERSION.SDK_INT)
+            .put("supported",nfc.isObserveModeSupported()).put("original_enabled",original);
+        CloudDiagnosticsActivity activity=(CloudDiagnosticsActivity)i.startActivitySync(
+            new Intent(context,CloudDiagnosticsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        i.waitForIdleSync();
+        try{
+            i.runOnMainSync(()->{
+                nfc.disableReaderMode(activity);
+                assertTrue(CardEmulation.getInstance(nfc).setPreferredService(activity,
+                    new android.content.ComponentName(context,CloudHceService.class)));
+                NfcGain.clear();
+                try{report.put("enable_returned",nfc.setObserveModeEnabled(true));}
+                catch(Exception e){try{report.put("enable_exception",e.getClass().getSimpleName());}catch(Exception impossible){throw new AssertionError(impossible);}}
+            });
+            report.put("enabled_after_attempt",nfc.isObserveModeEnabled());
+            Thread.sleep(nfc.isObserveModeEnabled()?10000:1000);
+            NfcGain.Stats stats=new NfcGain.Stats(NfcGain.after(0));
+            report.put("polling_frames",stats.frames).put("valid_gain_readings",stats.count);
+        }finally{
+            try{i.runOnMainSync(()->{if(nfc.isObserveModeEnabled()!=original)assertTrue(nfc.setObserveModeEnabled(original));});}
+            finally{i.runOnMainSync(activity::finish);}
+            report.put("restored_enabled",nfc.isObserveModeEnabled()).put("restoration_verified",original==nfc.isObserveModeEnabled());
+            try(java.io.FileOutputStream out=new java.io.FileOutputStream(new java.io.File(context.getCacheDir(),"nfc-observe-activation.json"))){out.write(report.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));}
+            assertEquals(original,nfc.isObserveModeEnabled());
+        }
+    }
     @Test @SdkSuppress(minSdkVersion=35) public void captureActualPollingFrames() throws Exception {
         android.app.Instrumentation i=InstrumentationRegistry.getInstrumentation();
         android.content.Context context=i.getTargetContext();NfcAdapter nfc=NfcAdapter.getDefaultAdapter(context);

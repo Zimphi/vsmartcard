@@ -145,3 +145,18 @@ explicitly instead of treating Android API level as evidence of support.
 Official references:
 [Android HCE polling](https://developer.android.com/develop/connectivity/nfc/hce#polling_loop_filters),
 [PollingFrame gain](https://developer.android.com/reference/android/nfc/cardemulation/PollingFrame#getVendorSpecificGain()).
+
+A follow-up physical activation test on the same Samsung (18 October 2026)
+called `setObserveModeEnabled(true)` with Phoenix as the preferred foreground
+HCE service. It returned `false`; Observe remained disabled and the original
+state was verified. The device firmware sets both
+`ro.nfc.observe_mode_supported` and `ro.nfc.get_caps_supported` to `false`.
+The test writes `nfc-observe-activation.json` to app cache.
+ADB NFC commands, Samsung NFC dumps, the available NFC process log and vendor
+configuration exposed no gain/RSSI/AGC readings. The REINER-SCT standard PC/SC
+feature query exposed only GET_TLV_PROPERTIES, which supplied no RF gain
+measurement. No private controller commands, root or firmware modifications
+were attempted. These results describe the installed firmware, not proof of
+physical controller incapability. Android requires controller/HAL support for
+Observe and polling notifications; an app permission or UI switch cannot add it.
+See [Android NCI capabilities](https://source.android.com/docs/core/connect/android-proprietary-nci-commands).
