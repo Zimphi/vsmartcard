@@ -17,13 +17,12 @@ import org.json.JSONObject;
 public final class CloudActivity extends CloudScreen {
     private static final int PAIRING_REQUEST=4703;
     private final Handler handler=new Handler();
-    private TextView state,server,pairingStatus,statusMark;
+    private TextView state,pairingStatus;
     private Button connectionAction;
     private ImageView connectionIcon;
     private RadioGroup roles;
     private final int cardChoiceId=R.id.cloud_card_mode, readerChoiceId=R.id.cloud_reader_mode;
     private String mode="card";
-    private boolean readerEnabled,cardPreferred;
     private final Runnable refresh=new Runnable(){public void run(){
         refreshConnection();handler.postDelayed(this,1000);
     }};
@@ -36,8 +35,8 @@ public final class CloudActivity extends CloudScreen {
         findViewById(R.id.cloud_language_button).setOnClickListener(v->chooseLanguage());
         findViewById(R.id.cloud_open_diagnostics).setOnClickListener(v->startActivity(new Intent(this,CloudDiagnosticsActivity.class).putExtra("mode",mode)));
         findViewById(R.id.cloud_logo).setOnClickListener(v->startActivity(new Intent(this,CloudInfoActivity.class)));
-        state=findViewById(R.id.cloud_state);server=findViewById(R.id.cloud_server);
-        pairingStatus=findViewById(R.id.cloud_pairing_status);statusMark=findViewById(R.id.cloud_status_mark);
+        state=findViewById(R.id.cloud_state);
+        pairingStatus=findViewById(R.id.cloud_pairing_status);
         connectionAction=findViewById(R.id.cloud_connection_action);connectionIcon=findViewById(R.id.cloud_connection_icon);
         findViewById(R.id.cloud_manage_pairing).setOnClickListener(v->startActivityForResult(new Intent(this,CloudPairingActivity.class),PAIRING_REQUEST));
         ((TextView)findViewById(R.id.cloud_version)).setText(getString(R.string.cloud_version,BuildConfig.VERSION_NAME));
@@ -50,35 +49,18 @@ public final class CloudActivity extends CloudScreen {
         if(refreshLanguage())return;
         JSONObject saved=null;
         try{saved=new DeviceVault(this).load();}catch(Exception ignored){}
-        server.setText(saved==null?getString(R.string.cloud_not_paired):saved.optString("server"));
         renderConnection(CloudService.connected(),saved!=null);
-        state.setText(CloudService.statusResource);state.setVisibility(CloudService.connected()?android.view.View.GONE:android.view.View.VISIBLE);
         NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);
+        boolean online=CloudService.connected();
+        boolean nfcUnavailable=nfc==null||!nfc.isEnabled();
+        state.setText(nfcUnavailable?(nfc==null?R.string.cloud_nfc_missing:R.string.cloud_nfc_off):CloudService.statusResource);
+        state.setVisibility(nfcUnavailable||!online?android.view.View.VISIBLE:android.view.View.GONE);
         CloudService service=CloudService.current;
-        boolean enabled=nfc!=null&&nfc.isEnabled();
-        boolean ready=service!=null&&enabled&&("reader".equals(mode)?readerEnabled:cardPreferred);
-        renderDetails(CloudService.connected(),nfc!=null,enabled,ready,
-            service==null||service.api==null?null:service.api.profile,
-            service!=null&&service.reader.detected(),service==null?NfcStatus.State.WAITING:service.nfcStatus.state());
-
+        renderProfile(online,service==null||service.api==null?null:service.api.profile,
+            service!=null&&service.reader.detected());
     }
-    void renderDetails(boolean online,boolean supported,boolean enabled,boolean ready,CloudApi.Profile profile,boolean cardPresent,NfcStatus.State traffic){
+    void renderProfile(boolean online,CloudApi.Profile profile,boolean cardPresent){
         boolean reading="reader".equals(mode);
-        TextView nfc=findViewById(R.id.cloud_nfc_status);
-        int nfcText=!supported?R.string.cloud_nfc_missing:!enabled?R.string.cloud_nfc_off:!online?R.string.cloud_nfc_disconnected
-            :!ready?R.string.cloud_nfc_unavailable:reading?R.string.cloud_nfc_reader_ready
-            :profile==null||!profile.active?R.string.cloud_nfc_no_profile:R.string.cloud_nfc_card_ready;
-        nfc.setText(nfcText);nfc.setTextColor(getColor(!supported||!enabled?R.color.cloud_red:R.color.cloud_muted));
-        int communication=R.string.cloud_traffic_idle;
-        if(online&&enabled)switch(traffic){
-            case TRANSFER:communication=R.string.cloud_traffic_busy;break;
-            case SESSION:communication=R.string.cloud_traffic_active;break;
-            case ENDED:communication=R.string.cloud_traffic_ended;break;
-            case FAILED:communication=R.string.cloud_traffic_failed;break;
-            default:break;
-        }
-        TextView transmission=findViewById(R.id.cloud_traffic_status);transmission.setText(communication);
-        transmission.setTextColor(getColor(communication==R.string.cloud_traffic_failed?R.color.cloud_red:communication==R.string.cloud_traffic_busy?R.color.cloud_green:R.color.cloud_muted));
         ((TextView)findViewById(R.id.cloud_profile_title)).setText(reading?R.string.cloud_reader_card_title:R.string.cloud_profile_title);
         TextView selected=findViewById(R.id.cloud_profile_status);
         if(reading)selected.setText(cardPresent?R.string.cloud_reader_detected:R.string.cloud_reader_waiting);
@@ -90,7 +72,6 @@ public final class CloudActivity extends CloudScreen {
     }
     void renderConnection(boolean online,boolean paired){
         int color=getColor(online?R.color.cloud_green:R.color.cloud_red);
-        statusMark.setText(online?"✓":"✕");statusMark.setTextColor(color);
         pairingStatus.setText(online?R.string.cloud_connected:paired?R.string.cloud_saved_offline:R.string.cloud_unpaired);
         pairingStatus.setTextColor(color);
         connectionIcon.setImageResource(online?R.drawable.cloud_connected:R.drawable.cloud_disconnected);
@@ -118,7 +99,6 @@ public final class CloudActivity extends CloudScreen {
         try{
             JSONObject saved=new DeviceVault(this).load();
             if(saved==null){startActivityForResult(new Intent(this,CloudPairingActivity.class),PAIRING_REQUEST);return;}
-            server.setText(saved.getString("server"));
             show(R.string.cloud_connecting);
             Intent start=new Intent(this,CloudService.class).putExtra("mode",mode);
             if(android.os.Build.VERSION.SDK_INT>=26)startForegroundService(start);else startService(start);
@@ -134,20 +114,19 @@ public final class CloudActivity extends CloudScreen {
             try{service.reader.attach(tag);runOnUiThread(()->show(R.string.cloud_reader_detected));}
             catch(Exception e){service.reader.detach();runOnUiThread(()->show(R.string.cloud_reader_error));}
         },NfcAdapter.FLAG_READER_NFC_A|NfcAdapter.FLAG_READER_NFC_B|NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,null);
-        readerEnabled=true;
     }
-    private void disableReader(){readerEnabled=false;NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);if(nfc!=null)nfc.disableReaderMode(this);}
+    private void disableReader(){NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);if(nfc!=null)nfc.disableReaderMode(this);}
     private void preferCardService(){
         NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);if(nfc==null)return;
         android.nfc.cardemulation.CardEmulation cards=android.nfc.cardemulation.CardEmulation.getInstance(nfc);
-        if("card".equals(mode))cardPreferred=cards.setPreferredService(this,new android.content.ComponentName(this,CloudHceService.class));
-        else {cardPreferred=false;cards.unsetPreferredService(this);}
+        if("card".equals(mode))cards.setPreferredService(this,new android.content.ComponentName(this,CloudHceService.class));
+        else cards.unsetPreferredService(this);
     }
     @Override protected void onResume(){super.onResume();
         CloudService service=CloudService.current;if(service!=null){mode=service.mode;roles.check("reader".equals(mode)?readerChoiceId:cardChoiceId);if("reader".equals(mode))enableReader();}
         preferCardService();handler.post(refresh);
     }
-    @Override protected void onPause(){cardPreferred=false;handler.removeCallbacks(refresh);disableReader();
+    @Override protected void onPause(){handler.removeCallbacks(refresh);disableReader();
         NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);if(nfc!=null)android.nfc.cardemulation.CardEmulation.getInstance(nfc).unsetPreferredService(this);
         CloudService service=CloudService.current;if(service!=null&&"reader".equals(service.mode))service.reader.detach();super.onPause();}
 }

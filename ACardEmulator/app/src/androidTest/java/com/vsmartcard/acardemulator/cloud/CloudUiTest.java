@@ -28,25 +28,26 @@ public class CloudUiTest {
             snapshot(activity,"cloud-ui-gain.png");
         });}finally{NfcGain.clear();i.runOnMainSync(activity::finish);}
     }
-    @Test public void pairedStatusSwitchesItsLabelMarkIconAndAction() {
+    @Test public void pairedStatusSwitchesItsLabelIconAndAction() {
         android.app.Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();
         CloudActivity activity=(CloudActivity)instrumentation.startActivitySync(
             new Intent(instrumentation.getTargetContext(),CloudActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         instrumentation.waitForIdleSync();
         instrumentation.runOnMainSync(()->{
+            for(String name:new String[]{"cloud_nfc_title","cloud_nfc_status","cloud_traffic_title","cloud_traffic_status","cloud_server","cloud_status_mark"}){int id=activity.getResources().getIdentifier(name,"id",activity.getPackageName());assertTrue(id==0||activity.findViewById(id)==null);}
+            assertEquals(1,((ViewGroup)activity.findViewById(R.id.cloud_connection_icon).getParent()).indexOfChild(activity.findViewById(R.id.cloud_pairing_status)));
             activity.renderConnection(false,true);
+            assertEquals(activity.getString(R.string.cloud_disconnected_icon),activity.findViewById(R.id.cloud_connection_icon).getContentDescription());
             assertEquals(activity.getString(R.string.cloud_connect),((TextView)activity.findViewById(R.id.cloud_connection_action)).getText().toString());
-            assertEquals("✕",((TextView)activity.findViewById(R.id.cloud_status_mark)).getText().toString());
             assertEquals(activity.getString(R.string.cloud_saved_offline),((TextView)activity.findViewById(R.id.cloud_pairing_status)).getText().toString());
             ((TextView)activity.findViewById(R.id.cloud_state)).setText("Nicht verbunden");
-            activity.renderDetails(false,true,true,false,null,false,NfcStatus.State.WAITING);
+            activity.renderProfile(false,null,false);
             snapshot(activity,"cloud-ui-disconnected.png");
             activity.renderConnection(true,true);
             assertEquals(activity.getString(R.string.cloud_disconnect),((TextView)activity.findViewById(R.id.cloud_connection_action)).getText().toString());
-            assertEquals("✓",((TextView)activity.findViewById(R.id.cloud_status_mark)).getText().toString());
             assertEquals(activity.getString(R.string.cloud_connected_icon),activity.findViewById(R.id.cloud_connection_icon).getContentDescription());
-            ((TextView)activity.findViewById(R.id.cloud_state)).setText("Online · Kartenmodus");
-            activity.renderDetails(true,true,true,true,new CloudApi.Profile(true,"erika-mustermann","eid",1),false,NfcStatus.State.SESSION);
+            activity.findViewById(R.id.cloud_state).setVisibility(View.GONE);
+            activity.renderProfile(true,new CloudApi.Profile(true,"erika-mustermann","eid",1),false);
             snapshot(activity,"cloud-ui-connected.png");
             activity.renderConnection(false,false);
             assertEquals(activity.getString(R.string.cloud_unpaired),((TextView)activity.findViewById(R.id.cloud_pairing_status)).getText().toString());
@@ -129,7 +130,7 @@ public class CloudUiTest {
         instrumentation.removeMonitor(monitor);
         instrumentation.runOnMainSync(activity::finish);
     }
-    @Test public void cloudNfcAndProfileRemainIndependentAndDeveloperLogIsOptIn(){
+    @Test public void simplifiedHomeKeepsProfileAndSeparateDiagnostics(){
         android.app.Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();
         android.content.Context context=instrumentation.getTargetContext();
         android.content.SharedPreferences preferences=context.getSharedPreferences("phoenix-ui",0);
@@ -137,16 +138,14 @@ public class CloudUiTest {
         CloudActivity activity=(CloudActivity)instrumentation.startActivitySync(new Intent(context,CloudActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         try{
             instrumentation.runOnMainSync(()->{
-                activity.renderDetails(true,true,false,false,new CloudApi.Profile(true,"erika-mustermann","eid",1),false,NfcStatus.State.WAITING);
-                assertEquals(activity.getString(R.string.cloud_nfc_off),((TextView)activity.findViewById(R.id.cloud_nfc_status)).getText().toString());
+                activity.renderProfile(true,new CloudApi.Profile(true,"erika-mustermann","eid",1),false);
                 assertTrue(((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString().contains("erika-mustermann"));
-                activity.renderDetails(true,true,true,true,new CloudApi.Profile(true,null,null,0),false,NfcStatus.State.TRANSFER);
+                activity.renderProfile(true,new CloudApi.Profile(true,null,null,0),false);
                 assertEquals(activity.getString(R.string.cloud_profile_legacy),((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString());
-                assertEquals(activity.getString(R.string.cloud_traffic_busy),((TextView)activity.findViewById(R.id.cloud_traffic_status)).getText().toString());
-                activity.renderDetails(false,true,true,false,new CloudApi.Profile(true,"old","eid",1),false,NfcStatus.State.SESSION);
+                activity.renderProfile(false,new CloudApi.Profile(true,"old","eid",1),false);
                 assertEquals(activity.getString(R.string.cloud_profile_offline),((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString());
                 ((android.widget.RadioButton)activity.findViewById(R.id.cloud_reader_mode)).performClick();
-                activity.renderDetails(true,true,true,true,null,true,NfcStatus.State.WAITING);
+                activity.renderProfile(true,null,true);
                 assertEquals(activity.getString(R.string.cloud_reader_detected),((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString());
             });
             android.app.Instrumentation.ActivityMonitor monitor=instrumentation.addMonitor(CloudDiagnosticsActivity.class.getName(),null,false);

@@ -160,3 +160,13 @@ were attempted. These results describe the installed firmware, not proof of
 physical controller incapability. Android requires controller/HAL support for
 Observe and polling notifications; an app permission or UI switch cannot add it.
 See [Android NCI capabilities](https://source.android.com/docs/core/connect/android-proprietary-nci-commands).
+
+### Phoenix Cloud 4.9: simpler home screen
+
+The home screen shows one compact cloud/phone connection icon with an explicit
+connected, saved/offline or unpaired label. The server URL and separate NFC
+readiness, communication and mode headings are removed. Read/simulate tiles,
+active profile, connection action, pairing management and diagnostics remain
+directly accessible. Disabled or missing NFC still produces an actionable
+notice, rather than silently appearing ready. Pairing credentials and protocol
+handling are unchanged.

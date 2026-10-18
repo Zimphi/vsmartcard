@@ -7,29 +7,20 @@
         </FrameLayout>
         <TextView style="@style/CloudHeading" android:layout_marginTop="8dp" android:layout_marginBottom="24dp" android:gravity="center" android:text="@string/cloud_title" android:textSize="24sp"/>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:background="@drawable/cloud_panel">
-            <TextView style="@style/CloudHeading" android:text="@string/cloud_pairing_title"/>
-            <TextView android:id="@+id/cloud_server" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/cloud_not_paired" android:textSize="15sp" android:textColor="@color/cloud_muted"/>
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="12dp">
-                <TextView android:id="@+id/cloud_status_mark" android:layout_width="32dp" android:layout_height="wrap_content" android:text="✕" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/cloud_red" android:importantForAccessibility="no"/>
-                <TextView android:id="@+id/cloud_pairing_status" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/cloud_unpaired" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/cloud_red" android:accessibilityLiveRegion="polite"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                <ImageView android:id="@+id/cloud_connection_icon" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginEnd="12dp" android:src="@drawable/cloud_disconnected" android:contentDescription="@string/cloud_disconnected_icon"/>
+                <TextView android:id="@+id/cloud_pairing_status" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/cloud_unpaired" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/cloud_red" android:accessibilityLiveRegion="polite"/>
             </LinearLayout>
             <TextView android:id="@+id/cloud_state" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/cloud_muted"/>
         </LinearLayout>
-        <TextView android:id="@+id/cloud_nfc_title" style="@style/CloudHeading" android:layout_marginTop="16dp" android:text="@string/cloud_nfc_title"/>
-        <TextView android:id="@+id/cloud_nfc_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="@color/cloud_muted" android:accessibilityLiveRegion="polite"/>
-        <TextView android:id="@+id/cloud_traffic_title" style="@style/CloudHeading" android:layout_marginTop="16dp" android:text="@string/cloud_communication_title"/>
-        <TextView android:id="@+id/cloud_traffic_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="@color/cloud_muted" android:accessibilityLiveRegion="polite"/>
         <TextView android:id="@+id/cloud_profile_title" style="@style/CloudHeading" android:layout_marginTop="16dp" android:text="@string/cloud_profile_title"/>
         <TextView android:id="@+id/cloud_profile_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="@color/cloud_muted" android:accessibilityLiveRegion="polite"/>
-        <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_mode_title"/>
-        <RadioGroup android:id="@+id/cloud_roles" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal" android:baselineAligned="false">
+        <RadioGroup android:id="@+id/cloud_roles" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:orientation="horizontal" android:baselineAligned="false">
             <RadioButton android:id="@+id/cloud_reader_mode" style="@style/CloudModeTile" android:layout_marginEnd="6dp" android:text="@string/cloud_reader_mode" android:drawableTop="@drawable/cloud_mode_read"/>
             <RadioButton android:id="@+id/cloud_card_mode" style="@style/CloudModeTile" android:layout_marginStart="6dp" android:text="@string/cloud_card_mode" android:drawableTop="@drawable/cloud_mode_simulate"/>
         </RadioGroup>
-        <ImageView android:id="@+id/cloud_connection_icon" android:layout_width="64dp" android:layout_height="64dp" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:src="@drawable/cloud_disconnected" android:contentDescription="@string/cloud_disconnected_icon"/>
         <Button android:id="@+id/cloud_connection_action" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="8dp" android:text="@string/cloud_connect" android:textAllCaps="false" android:textSize="16sp" android:textColor="#FFFFFF" android:backgroundTint="@color/cloud_blue"/>
         <Button android:id="@+id/cloud_manage_pairing" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_manage_pairing"/>
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/cloud_note" android:textColor="@color/cloud_muted" android:textSize="13sp"/>
         <Button android:id="@+id/cloud_open_diagnostics" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_diagnostics"/>
         <TextView android:id="@+id/cloud_version" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:gravity="center" android:textColor="@color/cloud_muted" android:textSize="12sp"/>
     </LinearLayout>
