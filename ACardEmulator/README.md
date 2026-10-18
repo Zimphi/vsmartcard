@@ -1,5 +1,12 @@
 # Android Smart Card Emulator
 
+## Aktuelle Phoenix-Laborversion: 4.10.1
+
+[Änderungen, Installation und bekannte Grenzen](releases/4.10.1.md).
+Die APK ist ein signierter Debug-Build für autorisierte Labor-/ADB-Tests;
+Quellarchiv und SHA-256-Prüfsummen werden beim GitHub-Release bereitgestellt.
+
+
 ## Phoenix Cloud · 4.7-phoenix
 
 The Phoenix screen displays the centered Phoenix logo and the currently paired
