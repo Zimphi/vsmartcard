@@ -14,6 +14,11 @@ public final class CloudHceService extends HostApduService {
     private final ThreadPoolExecutor worker=new ThreadPoolExecutor(1,1,0,TimeUnit.SECONDS,new ArrayBlockingQueue<>(2));
     private volatile int generation;
     private boolean failed;
+    @Override @android.annotation.TargetApi(35)
+    public void processPollingFrames(java.util.List<android.nfc.cardemulation.PollingFrame> frames){
+        for(android.nfc.cardemulation.PollingFrame frame:frames)
+            NfcGain.record(frame.getVendorSpecificGain(),android.os.SystemClock.elapsedRealtime());
+    }
     @Override public byte[] processCommandApdu(byte[] apdu,Bundle extras){
         CloudService service=CloudService.current;
         if(failed||service==null||!"card".equals(service.mode))return new byte[]{0x69,(byte)0x85};

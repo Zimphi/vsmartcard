@@ -14,6 +14,10 @@
         <ProgressBar android:id="@+id/cloud_quality_meter" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="12dp" android:max="100" android:progressTint="@color/cloud_green" android:layout_marginTop="8dp"/>
         <TextView android:id="@+id/cloud_quality_summary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="15sp" android:textColor="@color/cloud_ink"/>
         <com.vsmartcard.acardemulator.cloud.NfcQualityView android:id="@+id/cloud_quality_graph" android:layout_width="match_parent" android:layout_height="140dp" android:layout_marginTop="12dp"/>
+        <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_gain_title"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/cloud_gain_explanation" android:textSize="14sp" android:textColor="@color/cloud_muted"/>
+        <TextView android:id="@+id/cloud_gain_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="15sp" android:textColor="@color/cloud_ink"/>
+        <com.vsmartcard.acardemulator.cloud.NfcGainView android:id="@+id/cloud_gain_graph" android:layout_width="match_parent" android:layout_height="150dp" android:layout_marginTop="12dp"/>
         <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_test_title"/>
         <Spinner android:id="@+id/cloud_test_kind" android:layout_width="match_parent" android:layout_height="48dp" android:contentDescription="@string/cloud_test_kind"/>
         <Button android:id="@+id/cloud_test_reader" style="@style/CloudSecondaryButton" android:text="@string/cloud_test_reader"/>
@@ -24,6 +28,8 @@
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/cloud_position_explanation" android:textSize="14sp" android:textColor="@color/cloud_muted"/>
         <TextView android:id="@+id/cloud_position_arrow" android:layout_width="match_parent" android:layout_height="80dp" android:gravity="center" android:text="●" android:textSize="54sp" android:textColor="@color/cloud_blue"/>
         <TextView android:id="@+id/cloud_position_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="15sp" android:textColor="@color/cloud_ink"/>
+        <com.vsmartcard.acardemulator.cloud.NfcGainView android:id="@+id/cloud_position_gain_graph" android:layout_width="match_parent" android:layout_height="150dp" android:layout_marginTop="12dp" android:contentDescription="@string/cloud_gain_positions"/>
+        <TextView android:id="@+id/cloud_position_gain_values" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="14sp" android:textColor="@color/cloud_muted"/>
         <Button android:id="@+id/cloud_position_measure" style="@style/CloudSecondaryButton" android:layout_marginTop="12dp" android:text="@string/cloud_position_measure"/>
         <Button android:id="@+id/cloud_position_reset" style="@style/CloudSecondaryButton" android:layout_marginTop="8dp" android:text="@string/cloud_position_reset"/>
         <Button android:id="@+id/cloud_compatibility" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_compatibility"/>

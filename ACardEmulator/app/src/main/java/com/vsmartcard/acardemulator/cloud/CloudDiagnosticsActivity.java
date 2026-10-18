@@ -15,6 +15,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
     private boolean positionNotice;
     private PositionGuide guide=new PositionGuide();
     private long measuringFrom;
+    private long measuringGainFrom;
     private String measuringSource,sourceOverride,labMode,renderedLabProgress;
     private LabControl lab;private boolean labActive;
     private org.json.JSONObject successfulReport;
@@ -40,7 +41,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         findViewById(R.id.cloud_test_mac).setOnClickListener(v->confirmMacTest());
         findViewById(R.id.cloud_test_stop).setOnClickListener(v->{stopReaderTest();try{lab.cancel();}catch(Exception ignored){}labActive=false;useLab=false;measuringUntil=0;message(R.string.cloud_test_stopped);});
         findViewById(R.id.cloud_position_measure).setOnClickListener(v->measurePosition());
-        findViewById(R.id.cloud_position_reset).setOnClickListener(v->{if(positionReader)stopReaderTest();measuringUntil=0;positionNotice=false;guide=new PositionGuide();renderPosition();});
+        findViewById(R.id.cloud_position_reset).setOnClickListener(v->{if(positionReader)stopReaderTest();measuringUntil=0;positionNotice=false;guide=new PositionGuide();NfcGain.clear();renderPosition();});
         findViewById(R.id.cloud_compatibility).setOnClickListener(v->confirmCompatibility());
         findViewById(R.id.cloud_diagnostics_back).setOnClickListener(v->finish());
         android.widget.CheckBox developer=findViewById(R.id.cloud_developer_options);
@@ -75,7 +76,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         return "phone-reader".equals(sourceOverride)||(service!=null&&"reader".equals(service.mode))?"phone-reader":"phone-card";
     }
     private void refreshDiagnostics(){
-        readLabProgress();renderQuality();renderPosition();
+        readLabProgress();renderQuality();renderGain();renderPosition();
         android.nfc.NfcAdapter adapter=android.nfc.NfcAdapter.getDefaultAdapter(this);
         String values=getString(R.string.cloud_device_summary,android.os.Build.MANUFACTURER,android.os.Build.MODEL,android.os.Build.VERSION.RELEASE,android.os.Build.VERSION.SDK_INT,android.os.Build.VERSION.SECURITY_PATCH,
             getString(getPackageManager().hasSystemFeature("android.hardware.nfc.hce")?R.string.cloud_yes:R.string.cloud_no),getString(adapter!=null&&adapter.isEnabled()?R.string.cloud_yes:R.string.cloud_no));
@@ -99,15 +100,46 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         android.widget.ProgressBar meter=findViewById(R.id.cloud_quality_meter);meter.setProgress(stats.sufficient()?stats.percent():0);meter.setContentDescription(summary);
         NfcQualityView graph=findViewById(R.id.cloud_quality_graph);graph.samples(samples);graph.setContentDescription(summary);
     }
+    void renderGain(){
+        android.nfc.NfcAdapter nfc=android.nfc.NfcAdapter.getDefaultAdapter(this);
+        java.util.List<NfcGain.Sample> samples=NfcGain.after(0);
+        NfcGain.Stats stats=new NfcGain.Stats(samples);String summary;
+        if(android.os.Build.VERSION.SDK_INT<35)summary=getString(R.string.cloud_gain_old_android);
+        else if("phone-reader".equals(source()))summary=getString(R.string.cloud_gain_reader_mode);
+        else if(nfc==null||!nfc.isEnabled())summary=getString(R.string.cloud_test_nfc_required);
+        else if(!getPackageManager().hasSystemFeature("android.hardware.nfc.hce"))summary=getString(R.string.cloud_gain_no_hce);
+        else if(stats.count==0)summary=getString(nfc.isObserveModeSupported()?R.string.cloud_gain_waiting:R.string.cloud_gain_no_observe,stats.frames);
+        else {
+            NfcGain.Sample latest=null;for(NfcGain.Sample s:samples)if(s.value>=0)latest=s;
+            long age=Math.max(0,(android.os.SystemClock.elapsedRealtime()-latest.timeMs)/1000);
+            summary=getString(R.string.cloud_gain_summary,latest.value,stats.count,stats.frames,stats.min,stats.median,stats.max,age);
+        }
+        if("phone-reader".equals(source())||android.os.Build.VERSION.SDK_INT<35)samples=java.util.Collections.emptyList();
+        ((TextView)findViewById(R.id.cloud_gain_status)).setText(summary);
+        NfcGainView graph=findViewById(R.id.cloud_gain_graph);graph.samples(samples);graph.setContentDescription(summary);
+    }
+    private void renderPositionGain(){
+        StringBuilder values=new StringBuilder(getString(R.string.cloud_gain_positions));
+        for(int i=0;i<guide.index();i++){
+            NfcGain.Stats s=guide.gain(i);
+            values.append("\n").append(s.count==0?getString(R.string.cloud_gain_position_missing,i+1)
+                :getString(R.string.cloud_gain_position_value,i+1,s.median,s.min,s.max,s.count));
+        }
+        ((TextView)findViewById(R.id.cloud_position_gain_values)).setText(values);
+        NfcGainView graph=findViewById(R.id.cloud_position_gain_graph);graph.positions(guide);graph.setContentDescription(values);
+    }
     private void renderPosition(){
+        renderPositionGain();
         TextView status=findViewById(R.id.cloud_position_status),arrow=findViewById(R.id.cloud_position_arrow);
         String[] names=getString(R.string.cloud_position_names).split("\\|");
         if(measuringUntil>0){
             long remaining=measuringUntil-android.os.SystemClock.elapsedRealtime();
             java.util.List<NfcQuality.Sample> samples=NfcQuality.after(measuringSource,measuringFrom);
-            if(remaining>0){status.setText(getString(R.string.cloud_position_measuring,(remaining+999)/1000,samples.size()));return;}
+            if(remaining>0){status.setText(getString(R.string.cloud_position_measuring,(remaining+999)/1000,samples.size(),"phone-reader".equals(measuringSource)?0:new NfcGain.Stats(NfcGain.after(measuringGainFrom)).count));return;}
             measuringUntil=0;
-            if(!guide.record(samples)){positionNotice=true;findViewById(R.id.cloud_position_measure).setEnabled(true);status.setText(R.string.cloud_position_insufficient);if(positionReader)stopReaderTest();return;}
+            java.util.List<NfcGain.Sample> gains="phone-reader".equals(measuringSource)?java.util.Collections.emptyList():NfcGain.after(measuringGainFrom);
+            if(!guide.record(samples,gains)){positionNotice=true;findViewById(R.id.cloud_position_measure).setEnabled(true);status.setText(R.string.cloud_position_insufficient);if(positionReader)stopReaderTest();return;}
+            renderPositionGain();
             if(positionReader)stopReaderTest();
             if(guide.index()==9&&labActive&&"baseline".equals(labMode))try{lab.cancel();}catch(Exception failure){message(R.string.cloud_lab_error);}
         }
@@ -119,13 +151,17 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
     }
     private void beginPosition(){
         if(guide.index()>=9||measuringUntil>0)return;
-        positionNotice=false;measuringSource=source();measuringFrom=NfcQuality.sequence();measuringUntil=android.os.SystemClock.elapsedRealtime()+30000;
+        positionNotice=false;measuringSource=source();measuringFrom=NfcQuality.sequence();measuringGainFrom=NfcGain.sequence();measuringUntil=android.os.SystemClock.elapsedRealtime()+30000;
         findViewById(R.id.cloud_position_measure).setEnabled(false);
     }
     private void measurePosition(){
         if(labActive&&"baseline".equals(labMode)){positionReader=false;beginPosition();return;}
-        if("phone-reader".equals(source())||CloudService.current==null||"reader".equals(CloudService.current.mode)){
+        if("phone-reader".equals(source())||(CloudService.current==null&&(android.os.Build.VERSION.SDK_INT<35||!getPackageManager().hasSystemFeature("android.hardware.nfc.hce")))){
             confirmReaderTest(true);return;
+        }
+        android.nfc.NfcAdapter nfc=android.nfc.NfcAdapter.getDefaultAdapter(this);
+        if(!labActive&&android.os.Build.VERSION.SDK_INT>=35&&nfc!=null&&nfc.isEnabled()){
+            positionReader=false;beginPosition();return;
         }
         if(!labActive||!"baseline".equals(labMode)){message(R.string.cloud_position_baseline_required);return;}
         positionReader=false;beginPosition();
@@ -239,13 +275,13 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
         super.onResume();CloudService service=CloudService.current;
         android.nfc.NfcAdapter nfc=android.nfc.NfcAdapter.getDefaultAdapter(this);
         if(service!=null&&"reader".equals(service.mode)){testReader=service.reader;sourceOverride="phone-reader";enableReader();}
-        else if(service!=null&&nfc!=null&&nfc.isEnabled())android.nfc.cardemulation.CardEmulation.getInstance(nfc).setPreferredService(this,new android.content.ComponentName(this,CloudHceService.class));
+        else if(nfc!=null&&nfc.isEnabled()&&getPackageManager().hasSystemFeature("android.hardware.nfc.hce"))android.nfc.cardemulation.CardEmulation.getInstance(nfc).setPreferredService(this,new android.content.ComponentName(this,CloudHceService.class));
         handler.post(refresh);
     }
     @Override protected void onPause(){
         handler.removeCallbacks(refresh);stopReaderTest();measuringUntil=0;
         android.nfc.NfcAdapter nfc=android.nfc.NfcAdapter.getDefaultAdapter(this);
-        if(nfc!=null){nfc.disableReaderMode(this);if(nfc.isEnabled())android.nfc.cardemulation.CardEmulation.getInstance(nfc).unsetPreferredService(this);}
+        if(nfc!=null){nfc.disableReaderMode(this);if(nfc.isEnabled()&&getPackageManager().hasSystemFeature("android.hardware.nfc.hce"))android.nfc.cardemulation.CardEmulation.getInstance(nfc).unsetPreferredService(this);}
         super.onPause();
     }
 }

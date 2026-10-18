@@ -168,12 +168,12 @@
     <string name="cloud_test_wrong_mode">Wechsle auf der Startseite zu „Karte lesen“.</string>
     <string name="cloud_test_nfc_required">NFC einschalten und die App entsperrt lassen.</string>
     <string name="cloud_position_title">Geführte Positionssuche</string>
-    <string name="cloud_position_explanation">Bewege das Telefon mit Display nach oben über dem festen Leser/der Testkarte in Schritten von etwa 5 mm. Pfeile leiten durch ein 3×3-Raster; sie messen keine Funkrichtung. Jede Position wird 30 Sekunden mit mindestens 5 Messereignissen verglichen. Ohne laufenden Test gibt es keine Bewertung.</string>
+    <string name="cloud_position_explanation">Bewege das Telefon mit Display nach oben über dem festen Leser/der Testkarte in Schritten von etwa 5 mm. Pfeile leiten durch ein 3×3-Raster; sie messen keine Funkrichtung. Jede Position wird 30 Sekunden mit mindestens 5 Messereignissen verglichen. Gain wird bei Verfügbarkeit zusätzlich je Position erfasst. Eine Empfehlung benötigt mindestens 5 Übertragungsmessungen; reine Gain-Messungen ergeben nur einen Rohwertvergleich.</string>
     <string name="cloud_position_measure">Position messen · 30 s</string>
     <string name="cloud_position_reset">Positionssuche neu beginnen</string>
     <string name="cloud_position_step">Position %1$d/9 · %2$s · %3$s</string>
-    <string name="cloud_position_measuring">Ruhig halten · noch %1$d s · %2$d Messereignisse</string>
-    <string name="cloud_position_insufficient">Zu wenig Daten. Test starten/fortsetzen und dieselbe Position erneut messen.</string>
+    <string name="cloud_position_measuring">Ruhig halten · noch %1$d s · %2$d Übertragungsereignisse · %3$d gültige Gain-Werte</string>
+    <string name="cloud_position_insufficient">Zu wenig Daten: mindestens 5 Übertragungsereignisse oder 5 gültige Gain-Werte erforderlich. Dieselbe Position erneut messen.</string>
     <string name="cloud_position_best">Beste gemessene Position: %1$d · %2$s\nPfeil zeigt den Weg von der letzten Rasterposition dorthin. Keine Aussage über ungemessene Positionen.</string>
     <string name="cloud_position_no_best">Keine Position mit erfolgreicher Antwort. Anderen Bereich suchen und wiederholen.</string>
     <string name="cloud_position_names">Mitte|Links|Oben links|Oben|Oben rechts|Rechts|Unten rechts|Unten|Unten links</string>
@@ -204,4 +204,16 @@
     <string name="cloud_lab_connect_failures">Verbindungsaufbau fehlgeschlagen: %1$d</string>
     <string name="cloud_lab_card_required">Wähle auf der Startseite „Karte simulieren“ und verbinde Phoenix Cloud, bevor du den Cloud- oder Ausrichtungstest startest.</string>
     <string name="cloud_lab_no_target">Der Mac-Leser erkennt kein NFC-Ziel. Entsperre das Telefon und positioniere seine NFC-Antenne stabil über der Lesefläche. Es wurde noch kein Profil über NFC geprüft.</string>
+
+    <string name="cloud_gain_title">NFC-Feld: Hersteller-Gain</string>
+    <string name="cloud_gain_explanation">Gain-Rohwerte aus NFC-Polling-Frames (Android 15+), Skala 0–255. Keine kalibrierten dBm oder Prozentwerte; höhere Rohwerte bedeuten nicht herstellerübergreifend stärkeren Empfang. Lücken bedeuten fehlende Werte. Die Kurve zeigt die letzten bis zu 60 Frames; während APDU-Sitzungen können neue Polling-Werte ausbleiben.</string>
+    <string name="cloud_gain_old_android">Gain-Abfrage benötigt Android 15 oder neuer. Übertragungstests bleiben verfügbar.</string>
+    <string name="cloud_gain_reader_mode">Gain ist nur beim Empfang eines externen Lesefelds im Kartenmodus verfügbar. Android liefert über IsoDep im Lesemodus keinen Gain.</string>
+    <string name="cloud_gain_waiting">Noch keine gültigen Gain-Werte · %1$d Polling-Frames. Telefon kurz vom Leser abheben und wieder auflegen.</string>
+    <string name="cloud_gain_no_observe">Dieses Gerät meldet keine Observe-Mode-Unterstützung. Bisher keine Gain-Werte empfangen · %1$d Polling-Frames. Android-Version allein garantiert keine Messwerte.</string>
+    <string name="cloud_gain_summary">Letzter Gain: %1$d · %2$d/%3$d Frames mit Messwert\nMin. %4$d · Median %5$.1f · Max. %6$d\nLetzte gültige Messung vor %7$d s · Rohwert, kein RSSI</string>
+    <string name="cloud_gain_positions">Gain-Median je Rasterposition (1–9, Rohwerte 0–255). Die Empfehlung bewertet weiterhin zuverlässige Übertragungen; Gain allein bestimmt keine beste Position.</string>
+    <string name="cloud_gain_position_missing">Position %1$d: kein Gain-Messwert</string>
+    <string name="cloud_gain_position_value">Position %1$d: Median %2$.1f · %3$d–%4$d · %5$d Messwerte</string>
+    <string name="cloud_gain_no_hce">Dieses Gerät unterstützt keine Host-Kartenemulation (HCE). Polling-Gain ist hier nicht verfügbar; Lesetests bleiben möglich.</string>
 </resources>

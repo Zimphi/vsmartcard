@@ -4,15 +4,22 @@ import java.util.List;
 final class PositionGuide {
     static final int[][] POINTS={{0,0},{-1,0},{-1,-1},{0,-1},{1,-1},{1,0},{1,1},{0,1},{-1,1}};
     private final NfcQuality.Stats[] positions=new NfcQuality.Stats[9];
+    private final NfcGain.Stats[] gains=new NfcGain.Stats[9];
     private int index;
     int index(){return index;}
     boolean record(List<NfcQuality.Sample> samples){
+        return record(samples,java.util.Collections.emptyList());
+    }
+    NfcGain.Stats gain(int position){return gains[position];}
+    boolean record(List<NfcQuality.Sample> samples,List<NfcGain.Sample> rawGain){
         NfcQuality.Stats stats=new NfcQuality.Stats(samples);
-        if(!stats.sufficient()||index>=9)return false;positions[index++]=stats;return true;
+        NfcGain.Stats gain=new NfcGain.Stats(rawGain);
+        if(index>=9||(!stats.sufficient()&&!gain.sufficient()))return false;
+        gains[index]=gain;positions[index++]=stats;return true;
     }
     int best(){
         int best=-1;for(int i=0;i<index;i++){
-            NfcQuality.Stats s=positions[i];if(s.successes==0)continue;
+            NfcQuality.Stats s=positions[i];if(!s.sufficient()||s.successes==0)continue;
             if(best<0||1.0*s.successes/s.count>1.0*positions[best].successes/positions[best].count
                 ||(1L*s.successes*positions[best].count==1L*positions[best].successes*s.count&&s.p95<positions[best].p95))best=i;
         }return best;

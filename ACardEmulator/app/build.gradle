@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 34
+    compileSdk 35
     defaultConfig {
         applicationId "com.vsmartcard.acardemulator.phoenixcloud"
         minSdk 23
         //noinspection ExpiredTargetSdkVersion
         targetSdk 34
-        versionCode 17
-        versionName "4.7-phoenix"
+        versionCode 18
+        versionName "4.8-phoenix"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         base.archivesName = "ACardEmulator-$versionName"
     }

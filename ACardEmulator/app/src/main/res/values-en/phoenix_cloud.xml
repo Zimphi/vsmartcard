@@ -135,12 +135,12 @@
     <string name="cloud_test_wrong_mode">Switch to Read card on the home screen.</string>
     <string name="cloud_test_nfc_required">Enable NFC and keep the app unlocked.</string>
     <string name="cloud_position_title">Guided positioning</string>
-    <string name="cloud_position_explanation">Move the phone, screen facing up, over the fixed reader/test card in steps of about 5 mm. Arrows guide a 3×3 grid; they do not sense a radio direction. Each position is compared over 30 seconds with at least 5 observations. No running test means no assessment.</string>
+    <string name="cloud_position_explanation">Move the phone, screen facing up, over the fixed reader/test card in steps of about 5 mm. Arrows guide a 3×3 grid; they do not sense a radio direction. Each position is compared over 30 seconds with at least 5 observations. Available gain is also recorded per position. A recommendation requires at least 5 transfer observations; gain-only measurements provide a raw-value comparison.</string>
     <string name="cloud_position_measure">Measure position · 30 s</string>
     <string name="cloud_position_reset">Restart positioning</string>
     <string name="cloud_position_step">Position %1$d/9 · %2$s · %3$s</string>
-    <string name="cloud_position_measuring">Hold steady · %1$d s remaining · %2$d observations</string>
-    <string name="cloud_position_insufficient">Insufficient data. Start or continue a test and measure this position again.</string>
+    <string name="cloud_position_measuring">Hold steady · %1$d s remaining · %2$d transfer observations · %3$d valid gain readings</string>
+    <string name="cloud_position_insufficient">Insufficient data: at least 5 transfer observations or 5 valid gain readings are required. Measure this position again.</string>
     <string name="cloud_position_best">Best measured position: %1$d · %2$s\nThe arrow points there from the last grid position. No claim is made about unmeasured positions.</string>
     <string name="cloud_position_no_best">No position produced a successful response. Try another area and repeat.</string>
     <string name="cloud_position_names">Center|Left|Upper left|Up|Upper right|Right|Lower right|Down|Lower left</string>
@@ -171,4 +171,16 @@
     <string name="cloud_lab_connect_failures">Failed connection attempts: %1$d</string>
     <string name="cloud_lab_card_required">Choose “Simulate card” on the home screen and connect Phoenix Cloud before starting the cloud or positioning test.</string>
     <string name="cloud_lab_no_target">The Mac reader detects no NFC target. Unlock the phone and position its NFC antenna steadily over the reader. No profile has been verified over NFC yet.</string>
+
+    <string name="cloud_gain_title">NFC field: vendor gain</string>
+    <string name="cloud_gain_explanation">Raw gain from NFC polling frames (Android 15+), scale 0–255. Not calibrated dBm or percentages; higher raw values do not universally mean stronger reception. Gaps mean missing readings. The chart shows up to 60 recent frames; no new polling readings may arrive during APDU sessions.</string>
+    <string name="cloud_gain_old_android">Gain readings require Android 15 or later. Transfer tests remain available.</string>
+    <string name="cloud_gain_reader_mode">Gain is only available when receiving an external reader field in card mode. Android IsoDep provides no gain in reader mode.</string>
+    <string name="cloud_gain_waiting">No valid gain readings yet · %1$d polling frames. Briefly lift the phone off the reader and replace it.</string>
+    <string name="cloud_gain_no_observe">This device reports no Observe Mode support. No gain readings received so far · %1$d polling frames. Android version alone does not guarantee readings.</string>
+    <string name="cloud_gain_summary">Last gain: %1$d · %2$d/%3$d frames with a reading\nMin %4$d · median %5$.1f · max %6$d\nLast valid reading %7$d s ago · raw value, not RSSI</string>
+    <string name="cloud_gain_positions">Median gain per grid position (1–9, raw values 0–255). Recommendations still use reliable transfers; gain alone does not determine a best position.</string>
+    <string name="cloud_gain_position_missing">Position %1$d: no gain reading</string>
+    <string name="cloud_gain_position_value">Position %1$d: median %2$.1f · %3$d–%4$d · %5$d readings</string>
+    <string name="cloud_gain_no_hce">This device does not support host card emulation (HCE). Polling gain is unavailable here; reader tests remain available.</string>
 </resources>

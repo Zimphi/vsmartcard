@@ -110,3 +110,38 @@ which allows emulating the following cards:
 Additionally [PersoSim](https://persosim.de) can be used to emulate a german electronic identity card.
 
 Please refer to [our project's website](http://frankmorgner.github.io/vsmartcard/ACardEmulator/README.html) for more information.
+
+
+### Phoenix Cloud 4.8: NFC polling gain
+
+Android 15+ polling-frame callbacks now feed a separate vendor-gain chart
+(0–255) in diagnostics. Missing readings (`-1`) leave gaps; the latest reading
+has an age indicator. The graph retains at most 60 of 200 in-memory frames.
+No polling-frame bodies, card data or credentials are recorded or uploaded.
+The API is passive: this change does not enable Observe Mode, change the wallet
+role, install polling filters or alter APDU processing. Compile SDK is 35;
+target SDK and minimum SDK remain unchanged.
+
+The 3×3 position guide also records gain median/range/count over each 30-second
+measurement window. A position needs at least five transfer observations or
+five valid gain readings. Gain-only windows can be compared visually but never
+produce a best-position recommendation: vendor scales are not calibrated and
+do not define a universal stronger/weaker order. Transfer reliability remains
+the basis of recommendations. Gain is unavailable through Android IsoDep in
+reader mode, so the existing transfer tests remain the fallback.
+
+Physical test on Samsung SM-S918B / Android 16, 18 October 2026: the device
+reports `isObserveModeSupported() == false`. A 60-second observation with the
+Phoenix HCE service preferred and a real REINER-SCT NFC SELECT returned zero
+polling frames and zero gain values. The SELECT status was `6985` without an
+active CloudService; this verifies HCE reachability, not PACE/EAC. No synthetic
+samples were injected in the physical observation. Gain availability on other
+firmware/devices remains to be tested.
+
+Validation: 11 JVM tests, 19 device tests, one separate physical observation;
+Android lint has zero errors. `NfcGainProbeTest` records its bounded, token-free
+result to the app cache as `nfc-gain-probe.json` and reports missing measurements
+explicitly instead of treating Android API level as evidence of support.
+Official references:
+[Android HCE polling](https://developer.android.com/develop/connectivity/nfc/hce#polling_loop_filters),
+[PollingFrame gain](https://developer.android.com/reference/android/nfc/cardemulation/PollingFrame#getVendorSpecificGain()).

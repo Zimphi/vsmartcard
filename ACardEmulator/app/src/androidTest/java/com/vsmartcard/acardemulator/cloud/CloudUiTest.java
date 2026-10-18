@@ -13,6 +13,21 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CloudUiTest {
+    @Test public void gainChartShowsMissingValuesAndUncalibratedReadingsSeparately(){
+        android.app.Instrumentation i=InstrumentationRegistry.getInstrumentation();
+        CloudDiagnosticsActivity activity=(CloudDiagnosticsActivity)i.startActivitySync(
+            new Intent(i.getTargetContext(),CloudDiagnosticsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        i.waitForIdleSync();
+        try{i.runOnMainSync(()->{
+            NfcGain.clear();activity.renderGain();
+            assertNotNull(activity.findViewById(R.id.cloud_gain_graph));
+            assertNotNull(activity.findViewById(R.id.cloud_position_gain_graph));
+            NfcGain.record(-1,android.os.SystemClock.elapsedRealtime());
+            NfcGain.record(42,android.os.SystemClock.elapsedRealtime());activity.renderGain();
+            assertEquals(1,new NfcGain.Stats(NfcGain.after(0)).count);
+            snapshot(activity,"cloud-ui-gain.png");
+        });}finally{NfcGain.clear();i.runOnMainSync(activity::finish);}
+    }
     @Test public void pairedStatusSwitchesItsLabelMarkIconAndAction() {
         android.app.Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();
         CloudActivity activity=(CloudActivity)instrumentation.startActivitySync(
