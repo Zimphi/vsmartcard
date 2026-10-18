@@ -21,7 +21,6 @@
         </RadioGroup>
         <Button android:id="@+id/cloud_connection_action" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="8dp" android:text="@string/cloud_connect" android:textAllCaps="false" android:textSize="16sp" android:textColor="#FFFFFF" android:backgroundTint="@color/cloud_blue"/>
         <Button android:id="@+id/cloud_manage_pairing" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_manage_pairing"/>
-        <Button android:id="@+id/cloud_open_diagnostics" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_diagnostics"/>
         <TextView android:id="@+id/cloud_version" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:gravity="center" android:textColor="@color/cloud_muted" android:textSize="12sp"/>
     </LinearLayout>
 </ScrollView>

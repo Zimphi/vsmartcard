@@ -170,3 +170,15 @@ active profile, connection action, pairing management and diagnostics remain
 directly accessible. Disabled or missing NFC still produces an actionable
 notice, rather than silently appearing ready. Pairing credentials and protocol
 handling are unchanged.
+
+### Phoenix Cloud 4.10.0: pairing management and diagnostics navigation
+
+Manage pairing now opens only the saved pairing, connection status and a
+confirmed local delete action. Deleting stops CloudService and removes the
+encrypted local credentials; it does not revoke the server-side device entry.
+The confirmation explains this and directs users to remove that entry in the
+online simulator separately. QR/JSON setup remains available when connecting
+an unpaired phone or through setup help. A link icon replaces the large logo
+on both pairing pages. NFC diagnostics are accessible from the version/about
+page only, with no diagnostics button on the home screen. The displayed and
+built app version uses three components.

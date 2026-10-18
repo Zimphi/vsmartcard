@@ -1,0 +1,13 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="@color/cloud_background">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="24dp" android:orientation="vertical">
+        <Button android:id="@+id/cloud_pairing_back" style="@style/CloudSecondaryButton" android:text="@string/cloud_back"/>
+        <ImageView android:layout_width="64dp" android:layout_height="64dp" android:layout_gravity="center_horizontal" android:layout_marginTop="24dp" android:src="@drawable/cloud_pairing" android:importantForAccessibility="no"/>
+        <TextView style="@style/CloudHeading" android:layout_marginTop="16dp" android:layout_marginBottom="24dp" android:gravity="center" android:text="@string/cloud_pairing_title" android:textSize="24sp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:background="@drawable/cloud_panel">
+            <ImageView android:id="@+id/cloud_pairing_connection_icon" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center_horizontal" android:src="@drawable/cloud_disconnected" android:importantForAccessibility="no"/>
+            <TextView android:id="@+id/cloud_pairing_name" style="@style/CloudHeading" android:layout_marginTop="16dp" android:gravity="center"/>
+            <TextView android:id="@+id/cloud_pairing_message" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center" android:textSize="15sp" android:textColor="@color/cloud_muted" android:accessibilityLiveRegion="polite"/>
+            <Button android:id="@+id/cloud_delete_pairing" style="@style/CloudSecondaryButton" android:layout_marginTop="24dp" android:text="@string/cloud_delete_pairing" android:textColor="@color/cloud_red"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -33,12 +33,11 @@ public final class CloudActivity extends CloudScreen {
         findViewById(R.id.cloud_help).setOnClickListener(v->startActivity(new Intent(this,CloudHelpActivity.class)));
         ((TextView)findViewById(R.id.cloud_language_button)).setText(CloudLanguage.language(this).toUpperCase(java.util.Locale.ROOT));
         findViewById(R.id.cloud_language_button).setOnClickListener(v->chooseLanguage());
-        findViewById(R.id.cloud_open_diagnostics).setOnClickListener(v->startActivity(new Intent(this,CloudDiagnosticsActivity.class).putExtra("mode",mode)));
         findViewById(R.id.cloud_logo).setOnClickListener(v->startActivity(new Intent(this,CloudInfoActivity.class)));
         state=findViewById(R.id.cloud_state);
         pairingStatus=findViewById(R.id.cloud_pairing_status);
         connectionAction=findViewById(R.id.cloud_connection_action);connectionIcon=findViewById(R.id.cloud_connection_icon);
-        findViewById(R.id.cloud_manage_pairing).setOnClickListener(v->startActivityForResult(new Intent(this,CloudPairingActivity.class),PAIRING_REQUEST));
+        findViewById(R.id.cloud_manage_pairing).setOnClickListener(v->startActivityForResult(new Intent(this,CloudPairingActivity.class).putExtra("manage_pairing",true),PAIRING_REQUEST));
         ((TextView)findViewById(R.id.cloud_version)).setText(getString(R.string.cloud_version,BuildConfig.VERSION_NAME));
         roles=findViewById(R.id.cloud_roles);
         roles.check(cardChoiceId);roles.setOnCheckedChangeListener((group,id)->{mode=id==cardChoiceId?"card":"reader";if(CloudService.current!=null)connect();});

@@ -83,8 +83,9 @@ public class CloudUiTest {
         assertNotNull("Pairing page did not open",pairing);
         instrumentation.waitForIdleSync();
         instrumentation.runOnMainSync(()->{
-            assertNotNull(pairing.findViewById(R.id.cloud_scan));
-            assertNotNull(pairing.findViewById(R.id.cloud_import));
+            assertNull(pairing.findViewById(R.id.cloud_scan));
+            assertNull(pairing.findViewById(R.id.cloud_import));
+            assertNotNull(pairing.findViewById(R.id.cloud_delete_pairing));
             snapshot(pairing,"cloud-ui-pairing.png");
             pairing.findViewById(R.id.cloud_pairing_back).performClick();
         });
@@ -148,10 +149,14 @@ public class CloudUiTest {
                 activity.renderProfile(true,null,true);
                 assertEquals(activity.getString(R.string.cloud_reader_detected),((TextView)activity.findViewById(R.id.cloud_profile_status)).getText().toString());
             });
+            CloudInfoActivity info=(CloudInfoActivity)instrumentation.startActivitySync(new Intent(context,CloudInfoActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            instrumentation.waitForIdleSync();
             android.app.Instrumentation.ActivityMonitor monitor=instrumentation.addMonitor(CloudDiagnosticsActivity.class.getName(),null,false);
             instrumentation.runOnMainSync(()->{
                 assertNull(activity.findViewById(R.id.cloud_log_panel));
-                activity.findViewById(R.id.cloud_open_diagnostics).performClick();
+                int id=activity.getResources().getIdentifier("cloud_open_diagnostics","id",activity.getPackageName());
+                assertTrue(id==0||activity.findViewById(id)==null);
+                info.findViewById(R.id.cloud_info_diagnostics).performClick();
             });
             CloudDiagnosticsActivity diagnostics=(CloudDiagnosticsActivity)instrumentation.waitForMonitorWithTimeout(monitor,5000);assertNotNull(diagnostics);
             instrumentation.runOnMainSync(()->{
@@ -168,6 +173,7 @@ public class CloudUiTest {
                 diagnostics.findViewById(R.id.cloud_diagnostics_back).performClick();
             });
             instrumentation.removeMonitor(monitor);
+            instrumentation.runOnMainSync(info::finish);
         }finally{
             preferences.edit().putBoolean("developer_options",original).commit();
             instrumentation.runOnMainSync(activity::finish);
@@ -203,6 +209,36 @@ public class CloudUiTest {
         }finally{
             if(activity!=null){final CloudActivity home=activity;instrumentation.runOnMainSync(home::finish);}
             if(original==null)preferences.edit().remove("language").commit();else preferences.edit().putString("language",original).commit();
+        }
+    }
+    @Test public void managedPairingDeletesOnlyAfterConfirmationAndSetupStaysSeparate() throws Exception {
+        android.app.Instrumentation i=InstrumentationRegistry.getInstrumentation();
+        android.content.Context context=i.getTargetContext();
+        context.stopService(new Intent(context,CloudService.class));i.waitForIdleSync();
+        DeviceVault vault=new DeviceVault(context);org.json.JSONObject original=vault.load();
+        CloudPairingActivity manage=null;
+        try{
+            vault.save("https://example.invalid","synthetic-pairing-token");
+            manage=(CloudPairingActivity)i.startActivitySync(new Intent(context,CloudPairingActivity.class).putExtra("manage_pairing",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            final CloudPairingActivity screen=manage;i.waitForIdleSync();
+            i.runOnMainSync(()->{
+                assertNull(screen.findViewById(R.id.cloud_scan));assertNull(screen.findViewById(R.id.cloud_import));assertNull(screen.findViewById(R.id.cloud_logo));
+                assertEquals("example.invalid",((TextView)screen.findViewById(R.id.cloud_pairing_name)).getText().toString());
+                android.app.AlertDialog cancel=screen.showDeleteConfirmation();cancel.getButton(android.app.AlertDialog.BUTTON_NEGATIVE).performClick();
+            });
+            assertNotNull(vault.load());
+            i.runOnMainSync(()->{
+                snapshot(screen,"cloud-ui-managed-pairing.png");
+                android.app.AlertDialog confirm=screen.showDeleteConfirmation();confirm.getButton(android.app.AlertDialog.BUTTON_POSITIVE).performClick();
+            });
+            i.waitForIdleSync();assertNull(vault.load());assertTrue(screen.isFinishing());
+            CloudPairingActivity empty=(CloudPairingActivity)i.startActivitySync(new Intent(context,CloudPairingActivity.class).putExtra("manage_pairing",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            i.runOnMainSync(()->{assertEquals(View.GONE,empty.findViewById(R.id.cloud_delete_pairing).getVisibility());assertNull(empty.findViewById(R.id.cloud_scan));empty.finish();});
+            CloudPairingActivity setup=(CloudPairingActivity)i.startActivitySync(new Intent(context,CloudPairingActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            i.runOnMainSync(()->{assertNotNull(setup.findViewById(R.id.cloud_scan));assertNotNull(setup.findViewById(R.id.cloud_import));assertNull(setup.findViewById(R.id.cloud_logo));setup.finish();});
+        }finally{
+            if(manage!=null){final CloudPairingActivity screen=manage;i.runOnMainSync(screen::finish);}
+            if(original==null)vault.clear();else vault.save(original.getString("server"),original.getString("token"));
         }
     }
     private static void snapshot(android.app.Activity activity,String name){

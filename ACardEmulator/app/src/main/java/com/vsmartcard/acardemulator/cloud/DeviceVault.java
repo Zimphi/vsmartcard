@@ -38,5 +38,5 @@ final class DeviceVault {
             new GCMParameterSpec(128,Base64.decode(prefs.getString("iv",""),Base64.NO_WRAP)));
         return new JSONObject(new String(cipher.doFinal(Base64.decode(prefs.getString("sealed",""),Base64.NO_WRAP)),"UTF-8"));
     }
-    synchronized void clear() { prefs.edit().clear().commit(); }
+    synchronized void clear() { if(!prefs.edit().clear().commit())throw new IllegalStateException("Pairing could not be removed"); }
 }

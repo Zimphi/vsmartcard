@@ -17,8 +17,14 @@ public final class CloudPairingActivity extends CloudScreen {
     @Override public void onCreate(Bundle saved){
         super.onCreate(saved);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        if(getIntent().getBooleanExtra("manage_pairing",false)){
+            setContentView(R.layout.phoenix_cloud_pairing_manage);
+            state=findViewById(R.id.cloud_pairing_message);
+            findViewById(R.id.cloud_pairing_back).setOnClickListener(v->finish());
+            findViewById(R.id.cloud_delete_pairing).setOnClickListener(v->showDeleteConfirmation());
+            renderSavedPairing();return;
+        }
         setContentView(R.layout.phoenix_cloud_pairing);
-        findViewById(R.id.cloud_logo).setOnClickListener(v->startActivity(new Intent(this,CloudInfoActivity.class)));
         state=findViewById(R.id.cloud_pairing_message);
         findViewById(R.id.cloud_pairing_back).setOnClickListener(v->finish());
         findViewById(R.id.cloud_scan).setOnClickListener(v->new IntentIntegrator(this).setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
@@ -29,6 +35,26 @@ public final class CloudPairingActivity extends CloudScreen {
             startActivityForResult(file,IMPORT_JSON);
         });
         if(getIntent().getData()!=null){String raw=getIntent().getDataString();getIntent().setData(null);confirm(raw);}
+    }
+    private void renderSavedPairing(){
+        try{
+            JSONObject saved=new DeviceVault(this).load();
+            ((TextView)findViewById(R.id.cloud_pairing_name)).setText(saved==null?getString(R.string.cloud_not_paired):android.net.Uri.parse(saved.getString("server")).getHost());
+            boolean online=saved!=null&&CloudService.connected();
+            state.setText(online?R.string.cloud_connected:saved==null?R.string.cloud_not_paired:R.string.cloud_saved_offline);
+            ((android.widget.ImageView)findViewById(R.id.cloud_pairing_connection_icon)).setImageResource(online?R.drawable.cloud_connected:R.drawable.cloud_disconnected);
+            findViewById(R.id.cloud_delete_pairing).setVisibility(saved==null?android.view.View.GONE:android.view.View.VISIBLE);
+        }catch(Exception e){show(getString(R.string.cloud_saved_unavailable));}
+    }
+    AlertDialog showDeleteConfirmation(){
+        return new AlertDialog.Builder(this).setTitle(R.string.cloud_delete_pairing)
+            .setMessage(R.string.cloud_delete_pairing_notice)
+            .setNegativeButton(R.string.cloud_cancel,null)
+            .setPositiveButton(R.string.cloud_delete_pairing,(dialog,which)->{
+                stopService(new Intent(this,CloudService.class));
+                try{new DeviceVault(this).clear();setResult(RESULT_FIRST_USER);finish();}
+                catch(Exception e){show(getString(R.string.cloud_delete_pairing_failed));}
+            }).show();
     }
     private void show(String message){state.setText(message);}
     @Override protected void onActivityResult(int request,int result,Intent data){

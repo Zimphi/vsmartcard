@@ -25,7 +25,7 @@ public final class CloudHelpActivity extends CloudScreen {
         ((TextView)findViewById(R.id.cloud_help_title)).setText((step+1)+" / 5 · "+getString(titles[step]));
         ((TextView)findViewById(R.id.cloud_help_body)).setText(bodies[step]);
         ((ImageView)findViewById(R.id.cloud_help_image)).setImageResource(step==0?R.drawable.help_pairing:R.drawable.help_home);
-        ((TextView)findViewById(R.id.cloud_help_action)).setText(step==0?R.string.cloud_manage_pairing:step==4?R.string.cloud_diagnostics:step==2?R.string.cloud_website_title:R.string.cloud_back);
+        ((TextView)findViewById(R.id.cloud_help_action)).setText(step==0?R.string.cloud_setup_title:step==4?R.string.cloud_diagnostics:step==2?R.string.cloud_website_title:R.string.cloud_back);
         findViewById(R.id.cloud_help_previous).setEnabled(step>0);findViewById(R.id.cloud_help_next).setEnabled(step<4);
     }
     @Override public void onSaveInstanceState(Bundle saved){saved.putInt("step",step);super.onSaveInstanceState(saved);}

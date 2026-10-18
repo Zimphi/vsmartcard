@@ -183,4 +183,7 @@
     <string name="cloud_gain_position_missing">Position %1$d: no gain reading</string>
     <string name="cloud_gain_position_value">Position %1$d: median %2$.1f · %3$d–%4$d · %5$d readings</string>
     <string name="cloud_gain_no_hce">This device does not support host card emulation (HCE). Polling gain is unavailable here; reader tests remain available.</string>
+    <string name="cloud_delete_pairing">Delete pairing</string>
+    <string name="cloud_delete_pairing_notice">This disconnects the phone and deletes its saved pairing. You must pair again to reconnect. A device entry in the online simulator remains and can be deleted there separately.</string>
+    <string name="cloud_delete_pairing_failed">Could not delete the pairing. Please try again.</string>
 </resources>
