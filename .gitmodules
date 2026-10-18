@@ -1,27 +1,35 @@
 [submodule "ACardEmulator/app/src/main/external/ykneo-openpgp"]
 	path = ACardEmulator/app/src/main/external/ykneo-openpgp
 	url = https://github.com/Yubico/ykneo-openpgp.git
+
 [submodule "ACardEmulator/app/src/main/external/ykneo-oath"]
 	path = ACardEmulator/app/src/main/external/ykneo-oath
 	url = https://github.com/Yubico/ykneo-oath.git
+
 [submodule "ACardEmulator/app/src/main/external/IsoApplet"]
 	path = ACardEmulator/app/src/main/external/IsoApplet
 	url = https://github.com/philipWendland/IsoApplet.git
+
 [submodule "ACardEmulator/app/src/main/external/jcardsim"]
 	path = ACardEmulator/app/src/main/external/jcardsim
 	url = https://github.com/licel/jcardsim.git
+
 [submodule "ACardEmulator/app/src/main/external/MuscleApplet"]
 	path = ACardEmulator/app/src/main/external/MuscleApplet
 	url = https://github.com/martinpaljak/MuscleApplet.git
+
 [submodule "ACardEmulator/app/src/main/external/GidsApplet"]
 	path = ACardEmulator/app/src/main/external/GidsApplet
 	url = https://github.com/vletoux/GidsApplet.git
+
 [submodule "ACardEmulator/app/src/main/external/PivApplet"]
 	path = ACardEmulator/app/src/main/external/PivApplet
 	url = https://github.com/frankmorgner/PivApplet.git
+
 [submodule "ccid/src/OpenSC"]
 	path = ccid/src/OpenSC
 	url = https://github.com/OpenSC/OpenSC.git
+
 [submodule "virtualsmartcard/win32/DevMsi"]
 	path = virtualsmartcard/win32/DevMsi
 	url = https://github.com/frankmorgner/DevMsi.git
