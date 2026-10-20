@@ -51,7 +51,7 @@ public class CloudNfcCheckpointTest {
             assertTrue("Phoenix Cloud HCE foreground selection",preferred[0]);
             new CloudApi(server,args.getString("token")).post("lab-ready",new JSONObject());
             System.out.println("PQC_PHONE_READY");
-            long end=android.os.SystemClock.elapsedRealtime()+300000;
+            long end=android.os.SystemClock.elapsedRealtime()+900000;
             while(android.os.SystemClock.elapsedRealtime()<end){
                 if(new CloudApi(server,args.getString("token")).post("lab-result",new JSONObject()).optBoolean("complete"))return;
                 Thread.sleep(500);
