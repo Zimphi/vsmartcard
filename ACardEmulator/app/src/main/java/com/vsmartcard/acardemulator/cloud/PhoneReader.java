@@ -52,6 +52,10 @@ final class PhoneReader {
         if(!ID.equals(state.optString("selected","")))session=null;
     }
     void cancel(){detected=false;activity.ended();IsoDep active=card;if(active!=null)try{active.close();}catch(Exception ignored){}}
+    static boolean validProbeResponse(byte[] command,byte[] response){
+        return response.length>=2&&response[response.length-2]==(byte)0x90&&response[response.length-1]==0
+            &&(command[1]!=(byte)0xB0||response.length>2);
+    }
     void probe(String kind) throws Exception {
         final IsoDep active; synchronized(this){if(!present())throw new java.io.IOException("no_card");active=card;}
         String aid="eid".equals(kind)?"E80704007F00070302":"A0000002471001";
@@ -63,7 +67,7 @@ final class PhoneReader {
             NfcStatus.Transfer transfer=activity.started();byte[] response;
             try{response=active.transceive(command);if(response.length<2)throw new java.io.IOException();activity.completed(transfer);}
             catch(Exception e){activity.failed(transfer);detach();throw e;}
-            if(response[response.length-2]!=(byte)0x90||response[response.length-1]!=0)throw new java.io.IOException("unexpected_status");
+            if(!validProbeResponse(command,response))throw new java.io.IOException("unexpected_status");
         }
     }
     synchronized JSONObject execute(JSONObject job) throws Exception {

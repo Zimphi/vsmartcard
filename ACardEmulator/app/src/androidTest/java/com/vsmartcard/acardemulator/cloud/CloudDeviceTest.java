@@ -9,6 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CloudDeviceTest {
+    @Test public void emptyReadBinaryIsNotEvidenceThatCardAccessWasRead(){
+        byte[] read={0,(byte)0xB0,0,0,0},select={0,(byte)0xA4,4,0};
+        assertFalse(PhoneReader.validProbeResponse(read,new byte[]{(byte)0x90,0}));
+        assertTrue(PhoneReader.validProbeResponse(read,new byte[]{0x31,0,(byte)0x90,0}));
+        assertTrue(PhoneReader.validProbeResponse(select,new byte[]{(byte)0x90,0}));
+        assertFalse(PhoneReader.validProbeResponse(select,new byte[]{0x6A,(byte)0x82}));
+    }
     @Test public void jsonPairingUsesTheSameHttpsAndOneTimeCodeValidation() throws Exception {
         String json=new JSONObject().put("format","phoenix-phone-pairing-v1").put("server","https://example.org")
             .put("pairing_code","AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA").toString();
@@ -30,6 +37,14 @@ public class CloudDeviceTest {
                 assertFalse(String.valueOf(value).contains(token));
             vault.clear();assertNull(vault.load());
         }finally{if(original!=null)vault.save(original.getString("server"),original.getString("token"));else vault.clear();}
+    }
+    @Test public void aLateRevocationCannotEraseANewerPairing()throws Exception{
+        Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();DeviceVault vault=new DeviceVault(context);JSONObject original=vault.load();
+        try{
+            vault.save("https://example.invalid","old-token");vault.save("https://example.invalid","new-token");
+            new DeviceVault(context).clearIfMatches("https://example.invalid","old-token");assertEquals("new-token",vault.load().getString("token"));
+            vault.clearIfMatches("https://example.invalid","new-token");assertNull(vault.load());
+        }finally{if(original==null)vault.clear();else vault.save(original.getString("server"),original.getString("token"));}
     }
     private static class FakeApi extends CloudApi {
         final List<String> calls=new ArrayList<>();
@@ -112,6 +127,20 @@ public class CloudDeviceTest {
         api.apdu(new byte[]{0,(byte)0xb0,0,0});
         assertEquals(java.util.Arrays.asList("open","mount","apdu","apdu"),api.calls);
         api.end();assertEquals("close",api.calls.get(api.calls.size()-1));
+    }
+    @Test public void recoveryDiscardsOpaqueStateAndNeverReplaysTheOldApdu()throws Exception{
+        FakeApi api=new FakeApi();api.apdu(new byte[]{0,(byte)0xa4,4,0});
+        api.invalidate();api.apdu(new byte[]{0,(byte)0xb0,0,0});
+        assertEquals(java.util.Arrays.asList("open","mount","apdu","open","mount","apdu"),api.calls);
+    }
+    @Test public void revokeRequiresAckButAnAlreadyDeniedTokenCanBeRemoved()throws Exception{
+        CloudApi api=new CloudApi("https://example.invalid",null){@Override JSONObject post(String endpoint,JSONObject value)throws Exception{
+            assertEquals("disconnect",endpoint);assertEquals(0,value.length());throw new Denied(true);
+        }};api.revoke();
+        CloudApi offline=new CloudApi("https://example.invalid",null){@Override JSONObject post(String endpoint,JSONObject value)throws Exception{throw new java.io.IOException();}};
+        try{offline.revoke();fail("offline revocation claimed success");}catch(java.io.IOException expected){}
+        CloudApi gateway=new CloudApi("https://example.invalid",null){@Override JSONObject post(String endpoint,JSONObject value)throws Exception{throw new Denied();}};
+        try{gateway.revoke();fail("unconfirmed gateway denial claimed revocation");}catch(CloudApi.Denied expected){}
     }
     @Test public void uncertainApduIsNotRetried()throws Exception{
         FakeApi api=new FakeApi();api.uncertain=true;

@@ -14,6 +14,7 @@ import org.json.JSONObject;
 public final class CloudPairingActivity extends CloudScreen {
     private static final int IMPORT_JSON=4702;
     private TextView state;
+    CloudApi pairingApi;
     @Override public void onCreate(Bundle saved){
         super.onCreate(saved);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
@@ -40,6 +41,7 @@ public final class CloudPairingActivity extends CloudScreen {
         try{
             JSONObject saved=new DeviceVault(this).load();
             ((TextView)findViewById(R.id.cloud_pairing_name)).setText(saved==null?getString(R.string.cloud_not_paired):android.net.Uri.parse(saved.getString("server")).getHost());
+            if(saved!=null)pairingApi=new CloudApi(saved.getString("server"),saved.getString("token"));
             boolean online=saved!=null&&CloudService.connected();
             state.setText(online?R.string.cloud_connected:saved==null?R.string.cloud_not_paired:R.string.cloud_saved_offline);
             ((android.widget.ImageView)findViewById(R.id.cloud_pairing_connection_icon)).setImageResource(online?R.drawable.cloud_connected:R.drawable.cloud_disconnected);
@@ -52,8 +54,17 @@ public final class CloudPairingActivity extends CloudScreen {
             .setNegativeButton(R.string.cloud_cancel,null)
             .setPositiveButton(R.string.cloud_delete_pairing,(dialog,which)->{
                 stopService(new Intent(this,CloudService.class));
-                try{new DeviceVault(this).clear();setResult(RESULT_FIRST_USER);finish();}
-                catch(Exception e){show(getString(R.string.cloud_delete_pairing_failed));}
+                findViewById(R.id.cloud_delete_pairing).setEnabled(false);
+                show(getString(R.string.cloud_revoke_running));
+                new Thread(()->{
+                    try {
+                        pairingApi.revoke();new DeviceVault(this).clearIfMatches(pairingApi.server,pairingApi.token);
+                        runOnUiThread(()->{setResult(RESULT_FIRST_USER);finish();});
+                    }catch(Exception unavailable){runOnUiThread(()->{
+                        show(getString(R.string.cloud_delete_pairing_failed));
+                        findViewById(R.id.cloud_delete_pairing).setEnabled(true);
+                    });}
+                },"phoenix-revoke").start();
             }).show();
     }
     private void show(String message){state.setText(message);}

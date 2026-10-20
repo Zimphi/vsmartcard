@@ -11,6 +11,15 @@ import java.io.FileOutputStream;
 import static org.junit.Assert.*;
 
 public class LabControlTest {
+    private String originalEvidence;
+    @org.junit.Before public void preserveDiagnosticEvidence(){
+        originalEvidence=InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("phoenix-diagnostics",0).getString("records",null);
+    }
+    @org.junit.After public void restoreDiagnosticEvidence(){
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        android.content.SharedPreferences.Editor edit=InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("phoenix-diagnostics",0).edit();
+        if(originalEvidence==null)edit.remove("records");else edit.putString("records",originalEvidence);assertTrue(edit.commit());
+    }
     @Test public void privateRequestProgressAndCancelRequireMatchingId() throws Exception {
         Context original=InstrumentationRegistry.getInstrumentation().getTargetContext();
         final File folder=new File(original.getCacheDir(),"isolated-lab-test");assertTrue(folder.isDirectory()||folder.mkdir());
@@ -20,7 +29,7 @@ public class LabControlTest {
             String id=control.request("usb-profile","eid",1);
             JSONObject request=read(folder,"lab-request.json");
             assertTrue(request.getBoolean("consent"));assertEquals(id,request.getString("id"));
-            assertEquals(5,request.getJSONObject("device").length());
+            assertEquals(7,request.getJSONObject("device").length());
             JSONObject progress=new JSONObject().put("format","phoenix-lab-progress-v1").put("id","other")
                 .put("phase","complete").put("passed",true).put("profile_verified",true).put("successes",1)
                 .put("samples",new JSONArray().put(new JSONObject().put("sequence",1).put("duration_ms",12.5).put("success",true)));

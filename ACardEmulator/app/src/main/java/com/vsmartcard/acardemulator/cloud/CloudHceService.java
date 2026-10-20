@@ -21,7 +21,7 @@ public final class CloudHceService extends HostApduService {
     }
     @Override public byte[] processCommandApdu(byte[] apdu,Bundle extras){
         CloudService service=CloudService.current;
-        if(failed||service==null||!"card".equals(service.mode))return new byte[]{0x69,(byte)0x85};
+        if(failed||service==null||!CloudService.connected()||!"card".equals(service.mode))return new byte[]{0x69,(byte)0x85};
         int current=generation;
         NfcStatus.Transfer token=service.nfcStatus.started();
         try{worker.execute(()->{

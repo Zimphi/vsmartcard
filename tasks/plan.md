@@ -52,3 +52,9 @@ No real personal document data or compatibility submissions without user consent
 Deployment uses prepared temporary checkout, avoiding unrelated dirty source files.
 Measure APDU latency before optimizing; keep certificate validation, protocol order,
 secure messaging sequence counters, replay protection and owner isolation intact.
+
+## 2026-10-20: five requested reliability capabilities
+
+See [device reliability](../docs/device-reliability.md). Revoke → reconnect → exact
+compatibility evidence → safe export → guided test. User requested all five; no
+further planning approval needed. No cloud build/deploy. Preserve earlier tasks.

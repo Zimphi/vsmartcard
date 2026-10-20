@@ -2,6 +2,7 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
         <Button android:id="@+id/cloud_diagnostics_back" style="@style/CloudSecondaryButton" android:text="@string/cloud_back"/>
         <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_diagnostics" android:textSize="24sp"/>
+        <Button android:id="@+id/cloud_guided_test" style="@style/CloudSecondaryButton" android:layout_marginTop="16dp" android:text="@string/cloud_guided_test"/>
         <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_device_values"/>
         <TextView android:id="@+id/cloud_device_values" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/cloud_ink"/>
         <TextView android:id="@+id/cloud_reader_capabilities" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/cloud_muted"/>

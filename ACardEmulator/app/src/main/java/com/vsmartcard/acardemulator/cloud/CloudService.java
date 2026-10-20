@@ -25,6 +25,20 @@ public final class CloudService extends Service {
     volatile boolean localTest;
     CloudApi api;
     private ScheduledExecutorService worker;
+    private final CloudRetry retry=new CloudRetry();
+    private final java.util.concurrent.atomic.AtomicBoolean networkChanged=new java.util.concurrent.atomic.AtomicBoolean();
+    private android.net.ConnectivityManager connectivity;
+    private android.net.Network lastNetwork;
+    private final android.net.ConnectivityManager.NetworkCallback networkCallback=new android.net.ConnectivityManager.NetworkCallback(){
+        @Override public void onCapabilitiesChanged(android.net.Network network,android.net.NetworkCapabilities caps){
+            if(caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED)&&!network.equals(lastNetwork)){
+                lastNetwork=network;lastContact=0;networkChanged.set(true);retry.reset();
+            }
+        }
+        @Override public void onLost(android.net.Network network){
+            if(network.equals(lastNetwork)){lastNetwork=null;lastContact=0;networkChanged.set(true);retry.reset();}
+        }
+    };
     private volatile long lastBeat;
     private long lastInventory,lastLanguageAttempt;
     private volatile long lastContact;
@@ -33,7 +47,7 @@ public final class CloudService extends Service {
     }
     static boolean connected(){
         CloudService service=current;
-        return service!=null&&connectionFresh(true,service.lastContact,android.os.SystemClock.elapsedRealtime());
+        return service!=null&&!service.networkChanged.get()&&connectionFresh(true,service.lastContact,android.os.SystemClock.elapsedRealtime());
     }
     private final String instance=UUID.randomUUID().toString();
     @Override public IBinder onBind(Intent i){return null;}
@@ -55,6 +69,9 @@ public final class CloudService extends Service {
                 .setContentText(CloudLanguage.wrap(this).getString(R.string.cloud_notification_body))
                 .setSmallIcon(R.drawable.cloud_notification).setContentIntent(open).setOngoing(true).build());
             current=this;worker=Executors.newSingleThreadScheduledExecutor();
+            connectivity=getSystemService(android.net.ConnectivityManager.class);
+            if(connectivity!=null)connectivity.registerNetworkCallback(new android.net.NetworkRequest.Builder()
+                .addCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET).build(),networkCallback);
             worker.scheduleWithFixedDelay(this::tick,0,500,TimeUnit.MILLISECONDS);
         }catch(Exception e){statusResource=R.string.cloud_pair_unavailable;stopSelf();}
         return START_NOT_STICKY;
@@ -62,6 +79,8 @@ public final class CloudService extends Service {
     private void tick(){
         try{
             long now=android.os.SystemClock.elapsedRealtime();
+            if(!retry.ready(now))return;
+            if(networkChanged.getAndSet(false))dropCardState();
             NfcAdapter nfc=NfcAdapter.getDefaultAdapter(this);boolean enabled=nfc!=null&&nfc.isEnabled();
             android.content.SharedPreferences preferences=getSharedPreferences("phoenix-ui",0);
             if(preferences.getBoolean("language_dirty",false)&&(lastLanguageAttempt==0||now-lastLanguageAttempt>=30000)){
@@ -92,8 +111,18 @@ public final class CloudService extends Service {
                     api.post("reader-result",new JSONObject().put("id",job.getString("id")).put("result",result));
                 }
             }
-        }catch(CloudApi.Denied e){lastContact=0;statusResource=R.string.cloud_revoke_notice;new DeviceVault(this).clear();stopSelf();}
-        catch(Exception e){if(lastContact>0)CloudLog.add("CLOUD",R.string.cloud_log_disconnected,true);lastContact=0;nfcStatus.ended();statusResource=R.string.cloud_retry_notice;}
+            retry.reset();
+        }catch(CloudApi.Denied e){
+            if(e.deviceDenied){lastContact=0;statusResource=R.string.cloud_revoke_notice;try{new DeviceVault(this).clearIfMatches(api.server,api.token);}catch(Exception unavailable){}stopSelf();}
+            else unavailable();
+        }catch(Exception e){unavailable();}
+    }
+    private void unavailable(){
+        if(lastContact>0)CloudLog.add("CLOUD",R.string.cloud_log_disconnected,true);
+        dropCardState();retry.failed(android.os.SystemClock.elapsedRealtime());statusResource=R.string.cloud_retry_notice;
+    }
+    private void dropCardState(){
+        lastContact=0;lastBeat=0;lastInventory=0;api.invalidate();reader.detach();nfcStatus.ended();
     }
     private void inventory() throws Exception {
         JSONArray list=new JSONArray();
@@ -102,6 +131,7 @@ public final class CloudService extends Service {
     }
     @Override public void onDestroy(){
         CloudLog.add("CLOUD",R.string.cloud_log_stopped,false);
+        if(connectivity!=null)try{connectivity.unregisterNetworkCallback(networkCallback);}catch(IllegalArgumentException ignored){}
         current=null;if(worker!=null)worker.shutdownNow();reader.detach();
         if(api!=null)new Thread(api::end,"phoenix-close").start();
         statusResource=R.string.cloud_not_connected;stopForeground(true);super.onDestroy();

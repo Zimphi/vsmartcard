@@ -9,9 +9,13 @@ import javax.net.ssl.HttpsURLConnection;
 import org.json.JSONObject;
 
 class CloudApi {
-    static final class Denied extends Exception {}
+    static final class Denied extends Exception {
+        final boolean deviceDenied;
+        Denied(){this(false);}
+        Denied(boolean deviceDenied){this.deviceDenied=deviceDenied;}
+    }
     final String server;
-    private final String token;
+    final String token;
     private JSONObject session;
     private String openedId;
     static final class Profile {
@@ -54,7 +58,17 @@ class CloudApi {
         try {
             try(java.io.OutputStream out=c.getOutputStream()){out.write(data);}
             int status=c.getResponseCode();
-            if(status==401||status==403)throw new Denied();
+            if(status==401||status==403){
+                boolean denied=false;
+                try(InputStream error=c.getErrorStream()){
+                    if(error!=null){ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[1024];int n;
+                        while((n=error.read(buffer))!=-1){if(out.size()+n>4096)break;out.write(buffer,0,n);}
+                        String code=new JSONObject(out.toString("UTF-8")).optString("error");
+                        denied="device_denied".equals(code)||"bridge_expired".equals(code)||"bridge_unauthenticated".equals(code);
+                    }
+                }catch(Exception unconfirmed){}
+                throw new Denied(denied);
+            }
             if(status!=200)throw new java.io.IOException("Cloud request failed");
             ByteArrayOutputStream out=new ByteArrayOutputStream();
             try(InputStream in=c.getInputStream()) {
@@ -64,6 +78,11 @@ class CloudApi {
             return new JSONObject(out.toString("UTF-8"));
         } finally { c.disconnect(); }
     }
+    void revoke() throws Exception {
+        try { if(!post("disconnect",new JSONObject()).optBoolean("revoked"))throw new java.io.IOException(); }
+        catch(Denied alreadyRevoked) {if(!alreadyRevoked.deviceDenied)throw alreadyRevoked;}
+    }
+    synchronized void invalidate(){session=null;openedId=null;}
     synchronized JSONObject command(String operation,JSONObject fields) throws Exception {
         JSONObject state=session==null?new JSONObject().put("revision",0):new JSONObject(session.toString());
         state.put("request_id",UUID.randomUUID().toString());

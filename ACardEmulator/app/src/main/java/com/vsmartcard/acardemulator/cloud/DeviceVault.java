@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 final class DeviceVault {
     private static final String ALIAS = "phoenix-cloud-device-v1";
+    private static final Object LOCK=new Object();
     private final SharedPreferences prefs;
     DeviceVault(Context context) { prefs = context.getSharedPreferences("phoenix-cloud",Context.MODE_PRIVATE); }
     private SecretKey key() throws Exception {
@@ -26,17 +27,22 @@ final class DeviceVault {
         }
         return (SecretKey)store.getKey(ALIAS,null);
     }
-    synchronized void save(String server,String token) throws Exception {
+    void save(String server,String token) throws Exception {synchronized(LOCK){
         Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.ENCRYPT_MODE,key());
         byte[] data=new JSONObject().put("server",server).put("token",token).toString().getBytes("UTF-8");
         if (!prefs.edit().putString("iv",Base64.encodeToString(cipher.getIV(),Base64.NO_WRAP))
             .putString("sealed",Base64.encodeToString(cipher.doFinal(data),Base64.NO_WRAP)).commit()) throw new IllegalStateException();
-    }
-    synchronized JSONObject load() throws Exception {
+    }}
+    JSONObject load() throws Exception {synchronized(LOCK){
         if (!prefs.contains("sealed")) return null;
         Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.DECRYPT_MODE,key(),
             new GCMParameterSpec(128,Base64.decode(prefs.getString("iv",""),Base64.NO_WRAP)));
         return new JSONObject(new String(cipher.doFinal(Base64.decode(prefs.getString("sealed",""),Base64.NO_WRAP)),"UTF-8"));
+    }}
+    void clear() {synchronized(LOCK){ if(!prefs.edit().clear().commit())throw new IllegalStateException("Pairing could not be removed"); }}
+    void clearIfMatches(String server,String token)throws Exception{
+        synchronized(LOCK){JSONObject current=load();
+            if(current!=null&&server.equals(current.optString("server"))&&token.equals(current.optString("token")))clear();
+        }
     }
-    synchronized void clear() { if(!prefs.edit().clear().commit())throw new IllegalStateException("Pairing could not be removed"); }
 }

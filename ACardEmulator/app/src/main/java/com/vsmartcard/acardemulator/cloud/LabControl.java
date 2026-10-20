@@ -15,7 +15,8 @@ final class LabControl {
     LabControl(Context context){this.context=context;}
     static JSONObject device() throws Exception {
         return new JSONObject().put("manufacturer",Build.MANUFACTURER).put("model",Build.MODEL)
-            .put("android_release",Build.VERSION.RELEASE).put("api_level",Build.VERSION.SDK_INT).put("app_version",BuildConfig.VERSION_NAME);
+            .put("android_release",Build.VERSION.RELEASE).put("api_level",Build.VERSION.SDK_INT).put("app_version",BuildConfig.VERSION_NAME)
+            .put("security_patch",Build.VERSION.SECURITY_PATCH.isEmpty()?"unknown":Build.VERSION.SECURITY_PATCH).put("build_id",Build.ID.isEmpty()?"unknown":Build.ID);
     }
     private void write(String name,JSONObject value) throws Exception {
         File temp=new File(context.getCacheDir(),name+".tmp"),target=new File(context.getCacheDir(),name);
@@ -57,6 +58,11 @@ final class LabControl {
         int attempts=request.getInt("attempts");if(progress.optInt("successes")!=attempts)return null;
         JSONObject metadata=request.getJSONObject("device"),report=new JSONObject();
         for(String key:new String[]{"manufacturer","model","android_release","api_level","app_version"})report.put(key,metadata.get(key));
+        if(progress.has("checks")&&metadata.has("security_patch")&&metadata.has("build_id")){
+            report.put("kind",request.getString("kind")).put("checks",progress.getJSONArray("checks"))
+                .put("security_patch",metadata.getString("security_patch")).put("build_id",metadata.getString("build_id"))
+                .put("tested_at_ms",progress.optLong("completed_at_ms",request.getLong("requested_at_ms")));
+        }
         return report.put("test_id",request.getString("id"))
             .put("mode","card").put("source",source).put("attempts",attempts).put("successes",attempts).put("passed",true);
     }

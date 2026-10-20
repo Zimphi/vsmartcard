@@ -1,0 +1,25 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/cloud_background" android:fillViewport="true">
+ <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+  <Button android:id="@+id/cloud_guided_back" style="@style/CloudSecondaryButton" android:text="@string/cloud_back"/>
+  <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_guided_test" android:textSize="24sp"/>
+  <TextView style="@style/CloudHeading" android:layout_marginTop="16dp" android:text="@string/cloud_guided_instructions" android:textSize="14sp" android:textStyle="normal"/>
+  <Spinner android:id="@+id/cloud_guided_kind" android:layout_width="match_parent" android:layout_height="48dp" android:contentDescription="@string/cloud_test_kind"/>
+  <TextView style="@style/CloudHeading" android:layout_marginTop="16dp" android:text="@string/cloud_guided_step_connection"/>
+  <TextView android:id="@+id/cloud_guided_connection" style="@style/CloudHeading" android:textStyle="normal" android:layout_marginTop="8dp"/>
+  <TextView android:id="@+id/cloud_guided_summary" style="@style/CloudHeading" android:textStyle="normal" android:layout_marginTop="12dp"/>
+  <Button android:id="@+id/cloud_guided_next" style="@style/CloudSecondaryButton" android:layout_marginTop="12dp" android:text="@string/cloud_guided_connect"/>
+  <Button android:id="@+id/cloud_guided_stop" style="@style/CloudSecondaryButton" android:text="@string/cloud_guided_stop" android:layout_marginTop="8dp"/>
+  <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_guided_step_reader"/>
+  <TextView style="@style/CloudHeading" android:text="@string/cloud_guided_reader_notice" android:textStyle="normal" android:textSize="14sp" android:layout_marginTop="8dp"/>
+  <TextView android:id="@+id/cloud_guided_reader_result" style="@style/CloudHeading" android:textStyle="normal" android:layout_marginTop="12dp"/>
+  <Button android:id="@+id/cloud_guided_reader" style="@style/CloudSecondaryButton" android:text="@string/cloud_guided_reader" android:layout_marginTop="8dp"/>
+  <Button android:id="@+id/cloud_guided_confirm_reader" style="@style/CloudSecondaryButton" android:text="@string/cloud_guided_confirm_reader" android:layout_marginTop="8dp"/>
+  <TextView style="@style/CloudHeading" android:layout_marginTop="24dp" android:text="@string/cloud_guided_step_card"/>
+  <TextView style="@style/CloudHeading" android:text="@string/cloud_guided_card_notice" android:textStyle="normal" android:textSize="14sp" android:layout_marginTop="8dp"/>
+  <TextView android:id="@+id/cloud_guided_card_result" style="@style/CloudHeading" android:textStyle="normal" android:layout_marginTop="12dp"/>
+  <Button android:id="@+id/cloud_guided_card" style="@style/CloudSecondaryButton" android:text="@string/cloud_guided_card" android:layout_marginTop="8dp"/>
+  <Button android:id="@+id/cloud_guided_confirm_card" style="@style/CloudSecondaryButton" android:text="@string/cloud_guided_confirm_card" android:layout_marginTop="8dp"/>
+  <Button android:id="@+id/cloud_guided_cloud" style="@style/CloudSecondaryButton" android:text="@string/cloud_guided_cloud" android:layout_marginTop="24dp"/>
+  <TextView android:id="@+id/cloud_guided_cloud_results" style="@style/CloudHeading" android:text="@string/cloud_guided_cloud_context" android:textStyle="normal" android:textSize="14sp" android:layout_marginTop="8dp"/>
+ </LinearLayout>
+</ScrollView>

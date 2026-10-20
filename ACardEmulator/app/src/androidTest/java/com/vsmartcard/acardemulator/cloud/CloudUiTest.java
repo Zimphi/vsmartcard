@@ -229,8 +229,11 @@ public class CloudUiTest {
             assertNotNull(vault.load());
             i.runOnMainSync(()->{
                 snapshot(screen,"cloud-ui-managed-pairing.png");
+                screen.pairingApi=new CloudApi("https://example.invalid","synthetic-pairing-token"){@Override org.json.JSONObject post(String endpoint,org.json.JSONObject body)throws Exception{return new org.json.JSONObject().put("revoked",true);}};
                 android.app.AlertDialog confirm=screen.showDeleteConfirmation();confirm.getButton(android.app.AlertDialog.BUTTON_POSITIVE).performClick();
             });
+            long until=android.os.SystemClock.elapsedRealtime()+5000;
+            while(vault.load()!=null&&android.os.SystemClock.elapsedRealtime()<until)android.os.SystemClock.sleep(20);
             i.waitForIdleSync();assertNull(vault.load());assertTrue(screen.isFinishing());
             CloudPairingActivity empty=(CloudPairingActivity)i.startActivitySync(new Intent(context,CloudPairingActivity.class).putExtra("manage_pairing",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             i.runOnMainSync(()->{assertEquals(View.GONE,empty.findViewById(R.id.cloud_delete_pairing).getVisibility());assertNull(empty.findViewById(R.id.cloud_scan));empty.finish();});
@@ -240,6 +243,17 @@ public class CloudUiTest {
             if(manage!=null){final CloudPairingActivity screen=manage;i.runOnMainSync(screen::finish);}
             if(original==null)vault.clear();else vault.save(original.getString("server"),original.getString("token"));
         }
+    }
+    @Test public void guidedTestShowsPrerequisitesAndKeepsMissingEvidenceUntested()throws Exception{
+        android.app.Instrumentation i=InstrumentationRegistry.getInstrumentation();android.content.Context context=i.getTargetContext();
+        CloudTestActivity activity=(CloudTestActivity)i.startActivitySync(new Intent(context,CloudTestActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        i.waitForIdleSync();
+        try{i.runOnMainSync(()->{
+            assertNotNull(activity.findViewById(R.id.cloud_guided_stop));
+            assertNotNull(activity.findViewById(R.id.cloud_guided_confirm_reader));assertNotNull(activity.findViewById(R.id.cloud_guided_confirm_card));
+            assertFalse(((TextView)activity.findViewById(R.id.cloud_guided_summary)).getText().toString().isEmpty());
+            snapshot(activity,"cloud-ui-guided.png");
+        });}finally{i.runOnMainSync(activity::finish);}
     }
     private static void snapshot(android.app.Activity activity,String name){
         ViewGroup frame=activity.findViewById(android.R.id.content);

@@ -16,3 +16,12 @@
 - [x] HTTP pooling measured and implemented; eID PACE/EAC and RI/PS rechecked on final cloud build.
 - [ ] Legacy ePassport fixture TA fails because its embedded terminal credential is expired; validity validation is preserved.
 - [x] Code and release evidence committed; final push verification follows.
+
+## Device reliability (2026-10-20)
+
+- [x] Server device revocation and honest offline failure; other devices survive.
+- [x] Bounded reconnect/network wakeup; uncertain sessions discarded, no APDU replay.
+- [x] Exact kind/checks/build/date compatibility; consent and owner-bound readback.
+- [x] Disclosed SAF JSON export; planted secrets excluded and output bounded.
+- [x] Localized guided cloud/NFC/reader/simulation tests and mobile UI tests.
+- [x] Local build/lint/integration, device checks, review, commits and graph update.
