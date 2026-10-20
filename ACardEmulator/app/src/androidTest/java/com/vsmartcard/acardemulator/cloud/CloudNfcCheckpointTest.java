@@ -25,6 +25,7 @@ public class CloudNfcCheckpointTest {
             new ByteArrayInputStream(android.util.Base64.decode(args.getString("ca"),android.util.Base64.DEFAULT))));
         TrustManagerFactory trust=TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());trust.init(store);
         SSLContext tls=SSLContext.getInstance("TLS");tls.init(null,trust.getTrustManagers(),null);
+        CloudActivity activity=null;
         SSLSocketFactory previous=HttpsURLConnection.getDefaultSSLSocketFactory();
         try {
             context.stopService(new Intent(context,CloudService.class));
@@ -37,6 +38,18 @@ public class CloudNfcCheckpointTest {
             deadline=android.os.SystemClock.elapsedRealtime()+20000;
             while(!CloudService.connected()&&android.os.SystemClock.elapsedRealtime()<deadline)Thread.sleep(100);
             assertTrue("laboratory gateway connection",CloudService.connected());
+            activity=(CloudActivity)InstrumentationRegistry.getInstrumentation().startActivitySync(
+                new Intent(context,CloudActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+            android.nfc.NfcAdapter adapter=android.nfc.NfcAdapter.getDefaultAdapter(context);
+            final CloudActivity foreground=activity;
+            InstrumentationRegistry.getInstrumentation().runOnMainSync(()->foreground.getWindow()
+                .addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON));
+            final boolean[] preferred={false};
+            InstrumentationRegistry.getInstrumentation().runOnMainSync(()->preferred[0]=android.nfc.cardemulation.CardEmulation.getInstance(adapter)
+                .setPreferredService(foreground,new android.content.ComponentName(context,CloudHceService.class)));
+            assertTrue("Phoenix Cloud HCE foreground selection",preferred[0]);
+            new CloudApi(server,args.getString("token")).post("lab-ready",new JSONObject());
             System.out.println("PQC_PHONE_READY");
             long end=android.os.SystemClock.elapsedRealtime()+300000;
             while(android.os.SystemClock.elapsedRealtime()<end){
@@ -45,6 +58,7 @@ public class CloudNfcCheckpointTest {
             }
             fail("hardware test did not finish within laboratory window");
         } finally {
+            if(activity!=null){final CloudActivity closing=activity;InstrumentationRegistry.getInstrumentation().runOnMainSync(closing::finish);}
             context.stopService(new Intent(context,CloudService.class));
             long deadline=android.os.SystemClock.elapsedRealtime()+5000;
             while(CloudService.current!=null&&android.os.SystemClock.elapsedRealtime()<deadline)Thread.sleep(50);
