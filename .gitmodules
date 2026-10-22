@@ -17,4 +17,3 @@
 [submodule "ccid/src/OpenSC"]
 	path = ccid/src/OpenSC
 	url = https://github.com/OpenSC/OpenSC.git
-

@@ -17,7 +17,7 @@ Repo: https://github.com/Zimphi/vsmartcard.git
 Builds:
   - versionName: 4.11.0
     versionCode: 22
-    commit: 1a233637e435c690573b457d0a23c86feaa76a69
+    commit: 96030c68e833b48960875a5303f22e3020b56d51
     subdir: ACardEmulator
     submodules: true
     gradle:
@@ -33,10 +33,6 @@ Builds:
       - remote-reader
       - tests
       - virtualsmartcard
-      - ACardEmulator/app/libs
-      - ACardEmulator/app/src/full
-      - ACardEmulator/app/src/main/external/IsoApplet/ext
-      - ACardEmulator/app/src/main/external/PivApplet/ext
     scandelete:
       - ACardEmulator/app/src/main/external
 
