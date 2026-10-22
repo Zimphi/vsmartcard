@@ -6,7 +6,10 @@ on:
     paths:
       - ACardEmulator/**
       - fdroid/**
+      - LICENSES/**
+      - tools/update_android_notices.py
       - tools/check_fdroid_apk.py
+      - tests/test_android_notices.py
       - .github/workflows/fdroid.yml
 
 permissions:
@@ -25,9 +28,9 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v3
       - run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0'
-      - name: Build without bundled Samsung libraries
+      - run: python3 -m unittest discover -s tests -p test_android_notices.py
+      - name: Build the free app
         run: |
-          rm -rf ACardEmulator/app/libs
           ./ACardEmulator/gradlew -p ACardEmulator --no-daemon testFdroidReleaseUnitTest assembleFdroidRelease
       - name: Check the actual release APK
         run: |

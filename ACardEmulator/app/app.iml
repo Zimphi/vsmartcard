@@ -149,11 +149,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:animated-vector-drawable:23.2.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.google.zxing:core:3.2.1@jar" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: __local_jars__:/home/fm/Dokumente/vsmartcard/ACardEmulator/app/libs/accessory-v2.3.2.jar:unspecified@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:recyclerview-v7:23.2.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:design:23.2.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:support-vector-drawable:23.2.1@aar" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: __local_jars__:/home/fm/Dokumente/vsmartcard/ACardEmulator/app/libs/sdk-v1.0.0.jar:unspecified@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:support-annotations:23.2.1@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:appcompat-v7:23.2.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:support-v4:23.2.1@aar" level="project" />

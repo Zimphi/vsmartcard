@@ -1,6 +1,10 @@
 
 # Virtual Smart Card Architecture
 
+This fork's [code license review and cleanup](LICENSE_REVIEW.md) documents the
+removed Samsung SDKs and CPOL Windows reader/installer, retained free sources,
+and bundled Android third-party notices. F-Droid submission remains disabled.
+
 Welcome to the Virtual Smart Card Architecture. Virtual Smart Card Architecture is an umbrella project for various
 projects concerned with the emulation of different types of smart card readers
 or smart cards themselves.

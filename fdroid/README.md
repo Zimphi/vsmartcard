@@ -12,10 +12,14 @@ it has no publication step or signing credentials.
 
 ## What changed
 
-- Bundled Samsung SDK JARs are dependencies of `full` only. Their permissions,
-  receivers and accessory metadata also live in the `full` manifest only.
-- The `fdroid` variant retains the existing no-op watch service. Tizen/Samsung
-  watch integration is unavailable; NFC, HCE and Phoenix pairing remain.
+- Samsung SDK JARs, accessory service/receivers/permissions and watch settings
+  have been removed from the repository. Both `full` (legacy package ID) and
+  `fdroid` now contain only the free Android code; NFC/HCE/Phoenix pairing remain.
+- ISO/PIV applets are vendored as unchanged source-only snapshots with their
+  original licenses and pinned provenance, without their bundled proprietary SDKs.
+- Complete third-party license texts are bundled in the APK and shown offline
+  alongside the GPL text. A checked inventory covers all 66 release runtime
+  components and the included applet sources.
 - An explicit namespace keeps existing `ACardEmulator.R`/`BuildConfig` imports
   working when the source is checked out under a different directory name.
 - German/English Fastlane store descriptions and version notes are in
@@ -45,14 +49,15 @@ of the same package cannot be updated with a differently signed APK; uninstallin
 would remove pairing/settings. Do not uninstall a working installation to test
 this preparation.
 
-## Checked locally on 2026-10-22
+## Initial preparation checks on 2026-10-22
 
 - Original build: regression check reproduced Samsung manifest entries.
 - Prepared release APK: package, non-debuggable status and Samsung absence passed.
 - Release JVM suite: 12 tests, no failures or errors.
 - Android Lint: no errors, 92 warnings; the existing Gradle plugin also warns that
   compile SDK 35 is newer than its tested SDK. No SDK/plugin upgrade is included.
-- Both merged manifests checked: Samsung receivers remain in `full` only.
+- Before code cleanup, both merged manifests were checked. After cleanup, both
+  variants are built without Samsung SDK code or receiver declarations.
 - fdroidserver 2.4.5: metadata lint passed with the draft enabled only in a
   temporary copy, using the official category/anti-feature definitions.
 - Official source scanner on a disposable copy with the recipe cleanup: zero
@@ -62,13 +67,25 @@ this preparation.
   Android SDK cache, not an isolated F-Droid build-server VM.
 - No new physical NFC/reader tests or GitHub-hosted workflow run were performed.
 
+## Code cleanup verification
+
+[LICENSE_REVIEW.md](../LICENSE_REVIEW.md) and [LICENSES/README.md](../LICENSES/README.md)
+record the later code cleanup: all three Android release APKs build, runtime
+licenses are inventoried (66 unique components across both apps), complete
+notices are packaged, 12 Phoenix JVM tests and the notice/evidence tests pass,
+and the offline license dialog passes a deterministic e2e check on Android.
+The deliberate missing-inventory test is rejected by the Gradle license guard.
+Samsung, CPOL and unlicensed legacy code removal is described there. No artwork
+was changed. The external server and old Git history are not covered by a claim
+that the current Android runtime is free software.
+
 ## Draft recipe
 
 `metadata/com.vsmartcard.acardemulator.phoenixcloud.fdroid.yml` is an fdroiddata
 recipe draft. Its pinned source commit must contain the build changes and store
 texts, and must be publicly reachable before a future submission. It removes the
-unused desktop/reader projects, Samsung binaries and full-only sources, and
-unused bundled Java Card SDK/tool directories before source scanning. Remaining
+unused desktop/reader projects before source scanning. Samsung binaries and
+proprietary SDK trees have now been removed from the source branch itself. Remaining
 unused binary files are deleted by the scanner rather than ignored.
 
 To test later in a disposable checkout of `fdroiddata`, copy the recipe into
@@ -96,8 +113,9 @@ Local validation is not a submission. Leave `AutoUpdateMode: None` and
   channel (GitHub Issues is currently disabled for this fork).
 - Capture fresh store screenshots with synthetic profiles and no pairing tokens
   or personal data. None are copied from existing device/laboratory captures.
-- Recheck third-party/artwork licenses, maintenance/inclusion requirements and
-  the current F-Droid policy; this fork was created on 2026-10-14.
+- Review [the code license inventory and cleanup](../LICENSE_REVIEW.md) and the
+  current F-Droid maintenance/inclusion requirements; this fork was created on
+  2026-10-14. Artwork was left unchanged at the owner's explicit request.
 - Run physical NFC/reader regression tests on a release-signed test build.
 
 References: [inclusion policy](https://f-droid.org/docs/Inclusion_Policy/),

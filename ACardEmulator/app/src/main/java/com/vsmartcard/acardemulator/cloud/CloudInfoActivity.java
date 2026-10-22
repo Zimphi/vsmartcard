@@ -41,8 +41,11 @@ public final class CloudInfoActivity extends CloudScreen {
     }
     AlertDialog showLicense(){
         TextView text=new TextView(this);
-        try(Scanner license=new Scanner(getResources().openRawResource(R.raw.gpl_3),"UTF-8")){
-            text.setText(license.useDelimiter("\\A").next());
+        try(Scanner license=new Scanner(getResources().openRawResource(R.raw.gpl_3),"UTF-8");
+            Scanner thirdParty=new Scanner(getAssets().open("third_party_notices.txt"),"UTF-8")){
+            text.setText(license.useDelimiter("\\A").next()+thirdParty.useDelimiter("\\A").next());
+        }catch(java.io.IOException error){
+            throw new IllegalStateException("Bundled license notices unavailable",error);
         }
         text.setTextSize(14);text.setTextIsSelectable(true);
         int padding=(int)(16*getResources().getDisplayMetrics().density);

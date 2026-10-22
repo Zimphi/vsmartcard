@@ -1,6 +1,9 @@
 # Android Smart Card Emulator
 
 [F-Droid preparation and local validation](../fdroid/README.md) (not submitted).
+[Code license review and removed proprietary integrations](../LICENSE_REVIEW.md).
+Both Android flavors now exclude Samsung SDKs; Tizen accessory integration has
+been removed. Existing package IDs are retained.
 
 ## Aktuelle Phoenix-Laborversion: 4.10.1
 

@@ -1,0 +1,85 @@
+[
+  {
+    "path": "ACardEmulator",
+    "declared_license": "GPL-3.0-or-later",
+    "evidence": "ACardEmulator/COPYING",
+    "evidence_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+  },
+  {
+    "path": "remote-reader",
+    "declared_license": "GPL-3.0-or-later",
+    "evidence": "remote-reader/COPYING",
+    "evidence_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+  },
+  {
+    "path": "virtualsmartcard",
+    "declared_license": "GPL-3.0-or-later",
+    "evidence": "virtualsmartcard/COPYING",
+    "evidence_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+  },
+  {
+    "path": "pcsc-relay",
+    "declared_license": "GPL-3.0-or-later",
+    "evidence": "pcsc-relay/COPYING",
+    "evidence_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+  },
+  {
+    "path": "ccid",
+    "declared_license": "GPL-3.0-or-later",
+    "evidence": "ccid/COPYING",
+    "evidence_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+  },
+  {
+    "path": "TCardEmulator",
+    "declared_license": "GPL-3.0-only",
+    "evidence": "TCardEmulator/README.md",
+    "evidence_sha256": "1de7ed6604d2bfef7b958aa935379516c98261f655227ca528a3f5ff8cf4a1d6"
+  },
+  {
+    "path": "ACardEmulator/app/src/main/external/GidsApplet",
+    "declared_license": "GPL-3.0-or-later",
+    "evidence": "ACardEmulator/app/src/main/external/GidsApplet/src/com/mysmartlogon/gidsApplet/GidsApplet.java",
+    "evidence_sha256": "c2aab9e704b3ee9cf958246be7f0d6837510978c3b7efbe209c3d6a271a97c89",
+    "upstream_commit": "5851dbc612b369eaa712db4621748f1f9cd24414"
+  },
+  {
+    "path": "ACardEmulator/app/src/main/external/IsoApplet",
+    "declared_license": "GPL-3.0-or-later",
+    "evidence": "ACardEmulator/app/src/main/external/IsoApplet/LICENSE",
+    "evidence_sha256": "e1c0ad728983d8a57335e52cf1064f1affd1d454173d8cebd3ed8b4a72b48704"
+  },
+  {
+    "path": "ACardEmulator/app/src/main/external/PivApplet",
+    "declared_license": "MPL-2.0",
+    "evidence": "ACardEmulator/app/src/main/external/PivApplet/LICENSE",
+    "evidence_sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+  },
+  {
+    "path": "ACardEmulator/app/src/main/external/jcardsim",
+    "declared_license": "Apache-2.0",
+    "evidence": "ACardEmulator/app/src/main/external/jcardsim/README.md",
+    "evidence_sha256": "73033136ef5dd5e59afe98da50faa23ce1f2a32446f45fc5496bb9320c6e57a7",
+    "upstream_commit": "b6218da07a41875cdbfe4cde584e5281b0104fc6"
+  },
+  {
+    "path": "ACardEmulator/app/src/main/external/ykneo-openpgp",
+    "declared_license": "GPL-2.0-or-later",
+    "evidence": "ACardEmulator/app/src/main/external/ykneo-openpgp/README",
+    "evidence_sha256": "8c83e296419becb61c039e8adc2c6ed57194c451e707196da098e7cd387c1e81",
+    "upstream_commit": "289cb007799d0dafce7a8ba9653aa0a2aa4f651d"
+  },
+  {
+    "path": "ACardEmulator/app/src/main/external/ykneo-oath",
+    "declared_license": "GPL-3.0-or-later",
+    "evidence": "ACardEmulator/app/src/main/external/ykneo-oath/README",
+    "evidence_sha256": "2a3ab622eeeecd70c4940625657905572869dc2aee83573d76664c64eddf18e0",
+    "upstream_commit": "378c634ef9efbe80eb5deb11cfc0105271a44c3c"
+  },
+  {
+    "path": "ccid/src/OpenSC",
+    "declared_license": "LGPL-2.1-or-later AND LicenseRef-OpenSC-per-file-exceptions",
+    "evidence": "ccid/src/OpenSC/COPYING",
+    "evidence_sha256": "376b54d4c5f4aa99421823fa4da93e3ab73096fce2400e89858632aa7da24a14",
+    "upstream_commit": "043343d2df7b09d1938bc3dc313d86a96be457cc"
+  }
+]

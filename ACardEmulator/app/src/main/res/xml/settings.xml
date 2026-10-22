@@ -94,11 +94,6 @@
             android:key="internal_nfc">
         </Preference>
 
-        <Preference
-            android:title="Emulation with Gear's NFC"
-            android:summary="Samsung Gear needs to be installed for using the Gear's NFC emulation capabilities. (Disabled on F-Droid)"
-            android:key="gear_nfc">
-        </Preference>
 
     </PreferenceCategory>
 

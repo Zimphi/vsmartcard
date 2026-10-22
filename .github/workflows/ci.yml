@@ -106,52 +106,18 @@ jobs:
           ACardEmulator/app/build/outputs/apk
 
   virtualsmartcard-windows:
-    strategy:
-      matrix:
-        include:
-          - platform: x64
-            vcvars: amd64
-          - platform: ARM64
-            vcvars: arm64
     runs-on: windows-2025
     env:
-      MSBUILD_PLATFORM: ${{ matrix.platform }}
-      VCVARS_PLATFORM: ${{ matrix.vcvars }}
+      VCVARS_PLATFORM: amd64
     steps:
     - uses: actions/checkout@v6
-      with:
-        submodules: recursive
-    - run: choco install windowsdriverkit10 -y
     - run: .github/build-virtualsmartcard.ps1
-    - run: Move-Item -Path "virtualsmartcard\win32\BixVReaderInstaller\bin\x64\Release\BixVReaderInstaller.msi" -Destination "."
-    - run: Move-Item -Path "virtualsmartcard\win32\install_vpcd.bat" -Destination "."
-    - run: Move-Item -Path "virtualsmartcard\win32\uninstall_vpcd.bat" -Destination "."
-    - run: Move-Item -Path "dist\vicc.exe" -Destination "."
-    - run: Start-Process "install_vpcd.bat" -NoNewWindow -Wait
-      # the runner is a x64 platform
-      if: matrix.platform == 'x64'
-    - run: Get-Content "install.log"
-      # the runner is a x64 platform
-      if: matrix.platform == 'x64'
-    - name: Archive artifacts
-      id: upload-unsigned-artifact
-      uses: actions/upload-artifact@v7
+    - uses: actions/upload-artifact@v7
       with:
-        name: virtualsmartcard-win-${{ matrix.platform }}
+        name: virtualsmartcard-win-cli
         path: |
-          install_vpcd.bat
-          uninstall_vpcd.bat
-          vicc.exe
+          dist/vicc.exe
           vpcd-config.exe
-          BixVReaderInstaller.msi
-          BixVReader.cer
-    - name: Push to Signpath.io
-      #if: ${{ startsWith(github.ref, 'refs/tags/') && github.repository == 'frankmorgner/vsmartcard' }}
-      uses: signpath/github-action-submit-signing-request@v3
-      with:
-        api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-        organization-id: 'dc3833ee-761b-421d-bb75-c4eb9ca8c753'
-        project-slug: 'vsmartcard'
-        signing-policy-slug: 'test-signing'
-        github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
-        wait-for-completion: false
+          virtualsmartcard/COPYING
+          LICENSES/
+          LICENSE_REVIEW.md

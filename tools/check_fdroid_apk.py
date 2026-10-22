@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Check the built F-Droid APK, including classes pulled in transitively."""
 import re
 import subprocess
@@ -14,6 +15,9 @@ def check(apk, aapt2):
     badging = subprocess.check_output([aapt2, 'dump', 'badging', apk], text=True)
     assert 'application-debuggable' not in badging, 'Debug APK'
     with zipfile.ZipFile(apk) as archive:
+        notices = archive.read('assets/third_party_notices.txt').decode('utf-8')
+        for required in ['Apache License', 'Mozilla Public License', 'Bouncy Castle', 'jCardSim', 'GPL-3.0-or-later']:
+            assert required in notices, 'Missing license notice: ' + required
         dex = [name for name in archive.namelist() if re.fullmatch(r'classes\d*\.dex', name)]
         assert dex, 'APK has no DEX code'
         for name in dex:

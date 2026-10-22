@@ -86,3 +86,5 @@ crash-info/
 
 *.apk
 keystore.properties
+
+.e2e/

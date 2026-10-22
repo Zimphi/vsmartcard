@@ -124,6 +124,10 @@ public class CloudUiTest {
             assertTrue(licenseText.contains("GNU GENERAL PUBLIC LICENSE"));
             assertTrue(licenseText.contains("Version 3, 29 June 2007"));
             assertTrue(licenseText.contains("END OF TERMS AND CONDITIONS"));
+            assertTrue(licenseText.contains("Apache License"));
+            assertTrue(licenseText.contains("Mozilla Public License"));
+            assertTrue(licenseText.contains("Bouncy Castle"));
+            assertTrue(licenseText.contains("https://github.com/Zimphi/vsmartcard"));
             license.dismiss();
             snapshot(info,"cloud-ui-info.png");
             info.findViewById(R.id.cloud_info_back).performClick();

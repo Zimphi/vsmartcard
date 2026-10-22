@@ -113,55 +113,13 @@ make
 make install
 ```
 
-### Building vpcd on Windows
+### Windows support in this fork
 
-> [!NOTE]
-> **Version added: 0.7**
-> We implemented vpcd as user mode device driver for Windows so that
-> vpicc can directly be used in Windows' smart card applications that use
-> PC/SC.
-
-For the Windows integration we extended [Fabio Ottavi's UMDF Driver for a Virtual Smart Card Reader](http://www.codeproject.com/Articles/134010/An-UMDF-Driver-for-a-Virtual-Smart-Card-Reader) with a vpcd interface. If you choose
-to download the [Windows binaries](https://github.com/frankmorgner/vsmartcard/releases/tag/virtualsmartcard-0.11), you may directly jump to step 4.
-
-In the CI environment, we're building vpcd for Windows with Visual Studio
-Community 2019 with SDK/WDK for Windows 11. (The WDK version needs to match
-at least your targeted version of Windows, see this [guide for installing VS with WDK](https://learn.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk)) The vpcd installer additionally
-requires the [WiX Toolset 3.10](https://wixtoolset.org/releases/v3.10/stable) to be installed.
-
-1. Clone the git repository and make sure it is initialized with all
-   submodules:
-
-```sh
-git clone https://github.com/frankmorgner/vsmartcard.git
-cd vsmartcard
-git submodule update --init --recursive
-```
-
-2. In Visual Studio open vpcd's solution
-   `virtualsmartcard\win32\BixVReader.sln` and  ensure with the
-   configuration manager, that the project is built for your platform (i.e.
-   `x64` or `x82`).
-
-3. If you can successfully `Build the solution`, you can find
-   the installer (`BixVReaderInstaller.msi`) in
-   `virtualsmartcard\win32\BixVReaderInstaller\bin\*Release`
-
-For debugging vpcd and building the driver with an older version of Visual
-Studio or WDK please see [Fabio Ottavi's UMDF Driver for a Virtual Smart Card Reader] for details.
-
-All of Fabio's card connectors are still available, but inactive by default
-(see Configuring vpcd on Windows below).
-
-### Installing vpcd on Windows
-
-Double clicking `install_vpcd.bat` is all that is needed to install vpcd.
-Internally, it asks for admin rights to install the developer certificate
-`BixVReader.cer` into the computer's certificate store so that the driver's
-installer `BixVReaderInstaller.msi` can be verified and installed.
-
-To uninstall both, the driver and the developer certificate, you may use
-`uninstall_vpcd.bat`.
+The CPOL-licensed BixVReader driver and DevMsi installer have been removed.
+This fork no longer builds or supplies a Windows virtual PC/SC reader driver
+or MSI installer. The Windows CI job builds only the free `vicc` and
+`vpcd-config` command-line programs; a remote Unix vpcd reader can still be used.
+See [the license review](../LICENSE_REVIEW.md) for provenance and limitations.
 
 ## Using the Virtual Smart Card
 
@@ -307,32 +265,6 @@ In case of a problem, inspect the logs:
 ```sh
 log show --predicate '(subsystem == "com.apple.CryptoTokenKit")' --info --debug
 ```
-
-### Configuring vpcd on Windows
-
-The configuration file `BixVReader.ini` of vpcd is installed to
-`C:\Windows` (`%SystemRoot%`). The user mode device driver
-framework (`WUDFHost.exe`) should read it automatically and load the
-vpcd on startup. The Windows Device Manager `mmc devmgmt.msc` should
-list the `Bix Virtual Smart Card Reader`.
-
-vpcd opens a socket for vpicc and waits for incoming connections. The port
-to open should be specified in `TCP_PORT`:
-
-```sh
-[Driver]
-NumReaders=1
-
-[Reader0]
-RPC_TYPE=2
-VENDOR_NAME=Virtual Smart Card Architecture
-VENDOR_IFD_TYPE=Virtual PCD
-TCP_PORT=35963
-DECIVE_UNIT=0
-```
-
-Currently it is not possible to configure the Windows driver to connect to an
-vpicc running with `--reversed`.
 
 ### Running vpicc
 

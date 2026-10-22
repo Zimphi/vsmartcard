@@ -45,7 +45,6 @@ import com.vsmartcard.acardemulator.emulators.VICCEmulator;
 
 import java.util.Objects;
 
-import ACardEmulator.BuildConfig;
 import ACardEmulator.R;
 
 /**
@@ -217,29 +216,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
             });
 
-            final Preference gear_nfc = findPreference("gear_nfc");
-            //noinspection ConstantValue
-            if (BuildConfig.FLAVOR.equals("fdroid")) {
-                gear_nfc.setSummary("Samsung Gear integration is disabled in F-Droid");
-            } else {
-                gear_nfc.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    public boolean onPreferenceClick(Preference preference) {
-                        String gearPackage = "com.samsung.android.gearoplugin";
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        try {
-                            intent.setData(Uri.parse(
-                                    "https://play.google.com/store/apps/details?id="+gearPackage));
-                            intent.setPackage("com.android.vending");
-                            startActivity(intent);
-                        } catch (android.content.ActivityNotFoundException e) {
-                            intent.setData(Uri.parse(
-                                    "market://details?id="+gearPackage));
-                            intent.setPackage("com.sec.android.app.samsungapps");
-                        }
-                        return true;
-                    }
-                });
-            }
+
         }
 
         @Override

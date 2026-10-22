@@ -127,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(EmulatorSingleton.TAG);
         bManager.registerReceiver(bReceiver, intentFilter);
 
-        Intent serviceIntent = new Intent(this.getApplicationContext(), SmartcardProviderService.class);
-        startService(serviceIntent);
     }
 
     @Override

@@ -1,5 +1,9 @@
 # Tizen Smart Card Emulator
 
+The GPL-licensed Tizen sources are retained for reference. The Samsung accessory
+integration has been removed from this fork's Android app, so this companion is
+not supported by the Android builds supplied here. No Samsung SDK is bundled.
+
 > **Use a Tizen smartwatch as contact-less smart card**
 > **License:** GPL version 3
 > **Tested Platforms:** Tizen (Samsung Gear S2)

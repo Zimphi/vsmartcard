@@ -59,7 +59,6 @@ dependencies {
     testImplementation "junit:junit:4.13.2"
     androidTestImplementation "androidx.test:runner:1.6.2"
     androidTestImplementation "androidx.test.ext:junit:1.2.1"
-    fullImplementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.12.0'
@@ -67,3 +66,20 @@ dependencies {
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'org.bouncycastle:bcprov-jdk14:1.46'
 }
+
+// Fail a dependency change until its runtime licenses have been reviewed.
+tasks.register('verifyRuntimeLicenses') {
+    doLast {
+        def inventory = new groovy.json.JsonSlurper().parse(rootProject.file('../LICENSES/android-runtime.json'))
+        def reviewed = inventory.collect { it.coordinate }.toSet()
+        ['fdroidReleaseRuntimeClasspath', 'fullReleaseRuntimeClasspath'].each { name ->
+            def actual = configurations.getByName(name).resolvedConfiguration.resolvedArtifacts.collect {
+                it.moduleVersion.id.toString()
+            }.toSet()
+            if (actual != reviewed) {
+                throw new GradleException("Review LICENSES/android-runtime.json: added ${actual - reviewed}; removed ${reviewed - actual}")
+            }
+        }
+    }
+}
+tasks.named('preBuild').configure { dependsOn 'verifyRuntimeLicenses' }
