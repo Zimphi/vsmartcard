@@ -1,0 +1,1 @@
+F-Droid preparation for Phoenix Cloud 4.11.0: exclude Samsung accessory libraries and receivers from the free build. No F-Droid release has been submitted.

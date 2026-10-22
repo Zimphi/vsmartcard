@@ -1,5 +1,7 @@
 # Android Smart Card Emulator
 
+[F-Droid preparation and local validation](../fdroid/README.md) (not submitted).
+
 ## Aktuelle Phoenix-Laborversion: 4.10.1
 
 [Änderungen, Installation und bekannte Grenzen](releases/4.10.1.md).

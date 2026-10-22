@@ -1,0 +1,10 @@
+Phoenix Cloud verbindet ein Android-Smartphone per NFC und HTTPS mit einem Phoenix-eID-/ePassport-Simulator. Die App ist ein unabhängiger Fork von vsmartcard / Android Smart Card Emulator.
+
+• Gerät per QR-Code oder JSON-Konfigurationsdatei koppeln.
+• ISO-DEP-Chipkarten lesen oder ausgewählte Simulatorprofile per Host Card Emulation (HCE) bereitstellen.
+• Verbindungsstatus und NFC-Diagnose anzeigen.
+• Deutsche oder englische Oberfläche verwenden und die GPL-Lizenz offline lesen.
+
+Der Cloudbetrieb benötigt einen kompatiblen Phoenix-Server, ein Konto mit Zugang zu diesem Server und eine Internetverbindung. Der gehostete Phoenix-Dienst kann eine separate Lizenz erfordern. Die Serverfunktionen sind nicht Bestandteil dieser App. Nur für Karten und Testprofile verwenden, für die eine Berechtigung vorliegt.
+
+Die F-Droid-Variante enthält kein Samsung-Accessory-SDK und unterstützt die Tizen-Uhrenintegration nicht. NFC-Fähigkeiten und Zuverlässigkeit hängen von Smartphone und Lesegerät ab. Der Kamerazugriff ist optional; die JSON-Kopplung funktioniert ohne Kamera.

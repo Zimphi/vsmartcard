@@ -1,0 +1,1 @@
+F-Droid-Vorbereitung für Phoenix Cloud 4.11.0: Samsung-Accessory-Bibliotheken und -Empfänger aus dem freien Build entfernt. Noch keine Einreichung bei F-Droid.
