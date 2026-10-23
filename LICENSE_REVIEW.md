@@ -1,10 +1,41 @@
-# Code license review — 2026-10-22
+# Code license review — updated 2026-10-23
 
-Scope: the current `codex/fdroid-preparation` branch of Zimphi/vsmartcard,
+Scope: the current `main` branch of Zimphi/vsmartcard,
 including Android runtime dependencies, source submodules and known restricted
 legacy components. This is evidence of the licenses found and the cleanup
 performed, not a warranty of authorship, non-infringement or F-Droid acceptance.
 The F-Droid recipe is still **Disabled**. No F-Droid publication is authorized.
+
+## Phoenix source changes: follow-up review on 2026-10-23
+
+The application-source comparison uses `4ba41dcf^`, the parent of the first
+Phoenix Cloud commit, as its baseline. It covers the 26 added Java files under
+`ACardEmulator/app/src/main/java/com/vsmartcard/acardemulator/cloud/` and three
+modified original Java files: ACardEmulator's `MainActivity`/`SettingsActivity`
+and remote-reader's `MainActivity`.
+
+- All three original leading copyright/license blocks are retained verbatim,
+  including Frank Morgner's authorship and the GPL later-version permission.
+- The new Phoenix Java files now explicitly identify GPL-3.0-or-later. Dated
+  notices identify this fork's additions/modifications without assigning other
+  contributors' copyright to the fork owner.
+- Offline notices now include the application-source copyright lines as well
+  as the existing dependency notices, including the Android Open Source Project
+  attribution in remote-reader. Previously these appeared only in source.
+- The German/English source links and generated notices now point to `main`;
+  the old `codex/phoenix-cloud` source link named a removed branch.
+- The four Android Git submodules have no tracked local changes. The retained
+  IsoApplet/PivApplet snapshots keep their own licenses and original headers;
+  those sources have not been relicensed as Phoenix code.
+- The project owner confirmed authorship of the Phoenix logo and explicitly
+  permitted GPL-3.0-or-later distribution on 2026-10-23. This applies to the
+  Phoenix logo, not to unrelated upstream artwork or third-party marks.
+
+This source review found notice/source-link gaps and corrected them; it does
+not prove independent authorship of every line or rule out undisclosed copying.
+No new external code was added by this review. Existing LGPL/Apache/MPL/GPL
+component obligations remain as recorded below. Backend licensing and historical
+release artifacts are separate from this comparison.
 
 ## Removed or excluded
 
@@ -71,8 +102,9 @@ wrapper remains build tooling under Gradle's Apache-2.0 license.
 
 No font files are shipped by this fork. The Android UI selects system `sans`
 and diagnostic `monospace`; the app does not redistribute the device's fonts.
-The owner explicitly confirmed rights to the Phoenix logo and requested
-code-only cleanup. No logo, screenshot or other artwork was changed or relicensed.
+The owner explicitly confirmed authorship of the Phoenix logo and authorized
+GPL-3.0-or-later distribution on 2026-10-23. No artwork pixels were changed.
+This grant does not cover unrelated upstream artwork.
 The typeface drawn inside a logo is part of that artwork and cannot be identified
 from the app's system font settings.
 

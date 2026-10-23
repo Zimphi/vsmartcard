@@ -1,3 +1,4 @@
+// Phoenix fork modifications; notice added 2026-10-23. See LICENSE_REVIEW.md.
 /*
  * Copyright (C) 2015 Frank Morgner
  *

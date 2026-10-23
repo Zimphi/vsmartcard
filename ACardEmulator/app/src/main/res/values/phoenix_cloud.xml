@@ -65,7 +65,7 @@
     <string name="cloud_website_description">Die Simulation kannst du direkt im Browser auf epassport-simulator.de nutzen.</string>
     <string name="cloud_license_title">Lizenz und Herkunft</string>
     <string name="cloud_license_notice">Phoenix Cloud ist ein unabhängig weiterentwickelter Fork des Android Smart Card Emulator (ACardEmulator) aus vsmartcard von Frank Morgner und Mitwirkenden. Die Phoenix-Erweiterungen umfassen die Cloud-Anbindung, Kopplung und Oberfläche (Stand: 14.10.2026).\n\nDie App wird unter der ursprünglichen GNU General Public License, Version 3 oder jeder späteren Version (GPL-3.0-or-later), fortgeführt. Du darfst sie unter diesen Bedingungen weitergeben und verändern. Es besteht keine Gewährleistung, auch nicht für Marktgängigkeit oder Eignung für einen bestimmten Zweck. Ursprüngliche Urheberrechts- und Lizenzhinweise bleiben erhalten; enthaltene Drittkomponenten behalten ihre jeweiligen Lizenzen.</string>
-    <string name="cloud_source_links">Quellcode dieses Forks:\nhttps://github.com/Zimphi/vsmartcard/tree/codex/phoenix-cloud\n\nUrsprüngliches Projekt:\nhttps://github.com/frankmorgner/vsmartcard</string>
+    <string name="cloud_source_links">Quellcode dieses Forks:\nhttps://github.com/Zimphi/vsmartcard/tree/main\n\nUrsprüngliches Projekt:\nhttps://github.com/frankmorgner/vsmartcard</string>
     <string name="cloud_show_license">Vollständige GPL-Lizenz lesen</string>
     <string name="cloud_nfc_title">NFC-Bereitschaft</string>
     <string name="cloud_nfc_off">NFC ist ausgeschaltet</string>

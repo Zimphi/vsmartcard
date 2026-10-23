@@ -15,10 +15,15 @@ def notices(project):
         ('Phoenix Cloud' if phoenix else 'Remote Smart Card Reader') + ' — third-party licenses and source information',
         'The application is GPL-3.0-or-later. Original copyrights remain with their holders.\n'
         'Complete app and included applet source: https://github.com/Zimphi/vsmartcard\n'
-        'Branch: codex/fdroid-preparation. Preserve source and license notices when redistributing.\n'
+        'Branch: main. Preserve source and license notices when redistributing.\n'
         'Resolved Android release runtime components (transitive dependencies included):\n' +
         '\n'.join(item['coordinate'] + ' — ' + item['license'] for item in inventory),
     ]
+    copyrights = sorted({line.strip().removeprefix('*').strip()
+                         for source in (ROOT / project / 'app/src/main/java').rglob('*.java')
+                         for line in source.read_text().splitlines()
+                         if 'Copyright' in line})
+    parts.append('Application source copyright notices\n' + '\n'.join(copyrights))
     external = ROOT / 'ACardEmulator/app/src/main/external'
     applets = [
         ('jcardsim', 'Apache-2.0', 'src/main/java'),

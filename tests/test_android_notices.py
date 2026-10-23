@@ -11,6 +11,18 @@ GENERATE = runpy.run_path(str(ROOT / 'tools/update_android_notices.py'))['notice
 
 
 class AndroidNoticesTest(unittest.TestCase):
+    def test_phoenix_source_license_and_published_source_links(self):
+        cloud = ROOT / 'ACardEmulator/app/src/main/java/com/vsmartcard/acardemulator/cloud'
+        for source in cloud.glob('*.java'):
+            self.assertIn('SPDX-License-Identifier: GPL-3.0-or-later', source.read_text()[:300], source.name)
+        for locale in ['values', 'values-en']:
+            resources = (ROOT / 'ACardEmulator/app/src/main/res' / locale / 'phoenix_cloud.xml').read_text()
+            self.assertNotIn('/tree/codex/', resources)
+            self.assertIn('https://github.com/Zimphi/vsmartcard/tree/main', resources)
+        for project in ['ACardEmulator', 'remote-reader']:
+            self.assertIn('Frank Morgner', GENERATE(project))
+            self.assertNotIn('Branch: codex/', GENERATE(project))
+
     def test_source_evidence_and_removed_restricted_components(self):
         components = json.loads((ROOT / 'LICENSES/source-components.json').read_text())
         for component in components:

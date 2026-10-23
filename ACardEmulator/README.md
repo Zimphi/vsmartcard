@@ -5,6 +5,12 @@
 Both Android flavors now exclude Samsung SDKs; Tizen accessory integration has
 been removed. Existing package IDs are retained.
 
+## F-Droid-Vorbereitung: 4.11.0
+
+[Änderungen und offene Voraussetzungen](releases/4.11.0.md).
+Eigene F-Droid-Paketkennung, freie Android-Abhängigkeiten und vollständige
+Offline-Lizenztexte sind vorbereitet. Noch nicht bei F-Droid eingereicht.
+
 ## Aktuelle Phoenix-Laborversion: 4.10.1
 
 [Änderungen, Installation und bekannte Grenzen](releases/4.10.1.md).

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Phoenix Cloud extension; license notice added 2026-10-23. See LICENSE_REVIEW.md.
 package com.vsmartcard.acardemulator.cloud;
 import java.util.List;
 /** User-controlled grid search; arrows are instructions, not sensed RF direction. */

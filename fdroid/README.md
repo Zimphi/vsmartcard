@@ -67,7 +67,31 @@ this preparation.
   Android SDK cache, not an isolated F-Droid build-server VM.
 - No new physical NFC/reader tests or GitHub-hosted workflow run were performed.
 
+## Recheck on 2026-10-23
+
+- Current local working tree: offline release build passed, including 15 JVM
+  tests with no failures/errors and the runtime license inventory guard.
+- Both Python license/notice tests passed. Store text length checks passed.
+- Official fdroidserver metadata lint passed with the current recipe enabled
+  only in a temporary copy; it warned that `apksigner` was not on its PATH.
+- The new unsigned APK passed the package, release, license-notice and Samsung
+  manifest/DEX checks. SHA-256:
+  `6464b02130fc683f6e3f5e16dc7f6d9eb3ddad3300fa7828bf9e7d7db1960a90`.
+- This includes existing uncommitted NFC reader changes in the local tree;
+  it is not a reproduction of the recipe's pinned commit. The existing Android
+  Gradle plugin/SDK compatibility warnings remain. No new clean-server build,
+  source scan, hardware test or publication was performed.
+
 ## Code cleanup verification
+
+After consolidating all branch tips into `main` on 2026-10-23, the staged
+copyright/source-link corrections were exported to a separate clean build tree.
+That exact source passed all 12 committed release JVM tests, all three Python
+notice tests, the release build, the APK notice/Samsung checks, and the official
+F-Droid source and APK scanners (zero fatal problems each). The APK SHA-256 was
+`252f4ed8ffba6b447239d15327820f3de549e1c4b7e88f416ec49ed7bc6be398`.
+The uncommitted reader fixes and their additional tests were excluded from this
+check. This still used the local SDK/Gradle cache, not a F-Droid build-server VM.
 
 [LICENSE_REVIEW.md](../LICENSE_REVIEW.md) and [LICENSES/README.md](../LICENSES/README.md)
 record the later code cleanup: all three Android release APKs build, runtime
