@@ -17,7 +17,7 @@ Repo: https://github.com/Zimphi/vsmartcard.git
 Builds:
   - versionName: 4.11.0
     versionCode: 22
-    commit: 96030c68e833b48960875a5303f22e3020b56d51
+    commit: 44da44c0fdb85b236fc12d02417458a4ac1357c3
     subdir: ACardEmulator
     submodules: true
     gradle:
