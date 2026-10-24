@@ -55,16 +55,24 @@ final class PhoneReader {
     }
     void cancel(){detected=false;activity.ended();IsoDep active=card;if(active!=null)try{active.close();}catch(Exception ignored){}}
     static boolean validProbeResponse(byte[] command,byte[] response){
-        return response.length>=2&&response[response.length-2]==(byte)0x90&&response[response.length-1]==0
-            &&(command[1]!=(byte)0xB0||response.length>2);
+        if(response.length<2)return false;
+        boolean read=command[1]==(byte)0xB0;
+        boolean ok=response[response.length-2]==(byte)0x90&&response[response.length-1]==0;
+        // A short final READ BINARY returns its data with the ISO 7816 EOF warning.
+        boolean eof=read&&response[response.length-2]==0x62&&response[response.length-1]==(byte)0x82;
+        return (ok||eof)&&(!read||response.length>2);
+    }
+    static byte[][] probeCommands(String kind) throws Exception {
+        String aid="eid".equals(kind)?"E80704007F00070302":"A0000002471001";
+        byte[] selected=CloudApi.hex(aid,1,16);
+        // Case 3 SELECT has no Le: suppress FCI instead of leaving a 61xx response pending.
+        byte[] application=new byte[5+selected.length];application[1]=(byte)0xA4;application[2]=4;application[3]=0x0C;application[4]=(byte)selected.length;
+        System.arraycopy(selected,0,application,5,selected.length);
+        return new byte[][]{application,CloudApi.hex("00A4000C023F00",4,16),CloudApi.hex("00A4020C02011C",4,16),CloudApi.hex("00B0000000",4,16)};
     }
     void probe(String kind) throws Exception {
         final IsoDep active; synchronized(this){if(!present())throw new java.io.IOException("no_card");active=card;}
-        String aid="eid".equals(kind)?"E80704007F00070302":"A0000002471001";
-        byte[] selected=CloudApi.hex(aid,1,16);
-        byte[] application=new byte[5+selected.length];application[1]=(byte)0xA4;application[2]=4;application[4]=(byte)selected.length;
-        System.arraycopy(selected,0,application,5,selected.length);
-        byte[][] commands={application,CloudApi.hex("00A4000C023F00",4,16),CloudApi.hex("00A4020C02011C",4,16),CloudApi.hex("00B0000000",4,16)};
+        byte[][] commands=probeCommands(kind);
         for(byte[] command:commands){
             NfcStatus.Transfer transfer=activity.started();byte[] response;
             try{response=active.transceive(command);if(response.length<2)throw new java.io.IOException();activity.completed(transfer);}

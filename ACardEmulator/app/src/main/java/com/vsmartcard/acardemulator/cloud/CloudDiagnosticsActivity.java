@@ -220,6 +220,7 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
             testing=false;CloudService service=CloudService.current;if(service!=null)service.localTest=false;reader.detach();
             synchronized(this){readerThread=null;}
             runOnUiThread(()->{
+                disableReader();
                 if(isFinishing())return;
                 if(success)((TextView)findViewById(R.id.cloud_test_status)).setText(getString(R.string.cloud_test_pass,count));else message(R.string.cloud_test_fail);
                 try{
@@ -232,9 +233,13 @@ public final class CloudDiagnosticsActivity extends CloudScreen {
             });
         },"phoenix-reader-test");readerThread.start();
     }
+    private void disableReader(){
+        android.nfc.NfcAdapter nfc=android.nfc.NfcAdapter.getDefaultAdapter(this);
+        if(nfc!=null)nfc.disableReaderMode(this);
+    }
     private void stopReaderTest(){
         boolean running=testing;testing=false;CloudService service=CloudService.current;if(service!=null)service.localTest=false;
-        if(readerThread!=null)readerThread.interrupt();testReader.cancel();if(running)message(R.string.cloud_test_stopped);
+        if(readerThread!=null)readerThread.interrupt();disableReader();testReader.cancel();if(running)message(R.string.cloud_test_stopped);
     }
     private void confirmMacTest(){
         if(testing||labActive||readerThread!=null)return;
